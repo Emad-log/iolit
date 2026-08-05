@@ -1,41 +1,76 @@
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { useState } from "react";
 
 export const Newsletter = () => {
-  const handleSubmit = (e: any) => {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Subscribed!");
+    if (!email) return;
+    setError(false);
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "bottom" }),
+      });
+      if (res.ok) setSubmitted(true);
+      else setError(true);
+    } catch {
+      setError(true);
+    }
   };
 
   return (
-    <section id="newsletter">
-      <hr className="w-11/12 mx-auto" />
-
-      <div className="container py-24 sm:py-32">
-        <h3 className="text-center text-4xl md:text-5xl font-bold">
-          Join Our Daily{" "}
-          <span className="bg-gradient-to-b from-primary/60 to-primary text-transparent bg-clip-text">
-            Newsletter
-          </span>
-        </h3>
-        <p className="text-xl text-muted-foreground text-center mt-4 mb-8">
-          Lorem ipsum dolor sit amet consectetur.
-        </p>
-
-        <form
-          className="flex flex-col w-full md:flex-row md:w-6/12 lg:w-4/12 mx-auto gap-4 md:gap-2"
-          onSubmit={handleSubmit}
-        >
-          <Input
-            placeholder="leomirandadev@gmail.com"
-            className="bg-muted/50 dark:bg-muted/80 "
-            aria-label="email"
-          />
-          <Button>Subscribe</Button>
-        </form>
+    <section id="waitlist" className="relative px-6 py-24 overflow-hidden">
+      <div className="bloom">
+        <div className="bloom-1" style={{ top: "10%" }} />
+        <div className="bloom-2" style={{ top: "15%" }} />
       </div>
 
-      <hr className="w-11/12 mx-auto" />
+      <div className="relative z-10 max-w-xl mx-auto text-center">
+        <h2 className="font-serif text-[36px] tracking-[-0.02em] font-500 leading-[1.1] mb-3">
+          Ready to start <span className="accent-text italic">earning?</span>
+        </h2>
+
+        <p className="text-[15px] text-muted-foreground mb-8 max-w-sm mx-auto">
+          Early waitlist members get a{" "}
+          <span className="text-primary font-medium">2× earnings bonus</span>{" "}
+          for the first three months.
+        </p>
+
+        {submitted ? (
+          <div className="flex items-center justify-center gap-3">
+            <svg className="h-5 w-5 text-primary flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+            <span className="text-[15px] font-medium">
+              You're on the list. We'll email once.
+            </span>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex items-center justify-center gap-2 max-w-sm mx-auto">
+            <input
+              type="email"
+              required
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 h-12 px-5 text-[14px] rounded-full border border-border bg-card/80 backdrop-blur-sm focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-muted-foreground/50"
+            />
+            <button type="submit" className="btn-pill">
+              Claim my spot →
+            </button>
+          </form>
+        )}
+
+        {error && (
+          <p className="text-[12px] text-destructive mt-3">
+            Something went wrong. Try again, or email us directly.
+          </p>
+        )}
+      </div>
     </section>
   );
 };

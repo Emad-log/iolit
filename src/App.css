@@ -1,125 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* *=========== Default theme =========== */
-/* @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-  }
-} */
-
-/* *=========== Green theme =========== */
+/* Iolit — warm sand + violet light */
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 142.1 76.2% 36.3%;
-    --primary-foreground: 355.7 100% 97.3%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 142.1 76.2% 36.3%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 0 0% 95%;
-    --card: 24 9.8% 10%;
-    --card-foreground: 0 0% 95%;
-    --popover: 0 0% 9%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 142.1 70.6% 45.3%;
-    --primary-foreground: 144.9 80.4% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 12 6.5% 15.1%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 142.4 71.8% 29.2%;
+    /* Warm sand/ivory canvas */
+    --background: 38 40% 95%;
+    --foreground: 30 22% 12%;
+    --card: 38 45% 97%;
+    --card-foreground: 30 22% 12%;
+    --popover: 38 45% 97%;
+    --popover-foreground: 30 22% 12%;
+    /* Violet */
+    --primary: 262 70% 45%;
+    --primary-foreground: 38 40% 96%;
+    --secondary: 38 30% 91%;
+    --secondary-foreground: 30 22% 12%;
+    --muted: 38 28% 90%;
+    --muted-foreground: 30 10% 42%;
+    --accent: 262 40% 94%;
+    --accent-foreground: 30 22% 12%;
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 38 40% 96%;
+    --border: 38 22% 86%;
+    --input: 38 22% 86%;
+    --ring: 262 70% 45%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
+  h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-optical-sizing: auto; }
+  section[id] { scroll-margin-top: 80px; }
 }
+
+/* Violet light bloom — layered blur (benjaminux technique, light mode) */
+.bloom {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.bloom-1, .bloom-2, .bloom-3 {
+  position: absolute;
+  border-radius: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.bloom-1 {
+  top: 2%; width: 760px; height: 560px;
+  background: #7c3aed; opacity: 0.06;
+  filter: blur(140px);
+}
+.bloom-2 {
+  top: 6%; width: 480px; height: 380px;
+  background: #8b5cf6; opacity: 0.09;
+  filter: blur(100px);
+}
+.bloom-3 {
+  top: 10%; width: 260px; height: 220px;
+  background: #c4b5fd; opacity: 0.16;
+  filter: blur(70px);
+}
+
+/* Concentric rings + hairlines — the composition grid */
+.rings {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+.rings::before {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 150vmax; height: 150vmax;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 34.9%, #7c3aed 35%, #7c3aed 35.1%, transparent 35.2%),
+    radial-gradient(circle, transparent 39.9%, #7c3aed 40%, #7c3aed 40.1%, transparent 40.2%),
+    radial-gradient(circle, transparent 44.9%, #7c3aed 45%, #7c3aed 45.1%, transparent 45.2%);
+  opacity: 0.05;
+}
+
+/* Violet gradient accent for headline word */
+.accent-text {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 60%, #5b21b6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Pill button — violet, with soft light */
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 46px;
+  padding: 0 26px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 45%, #6d28d9 100%);
+  color: #faf7f0;
+  box-shadow: 0 1px 3px rgba(109, 40, 217, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.btn-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(109, 40, 217, 0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+html { scroll-behavior: smooth; }

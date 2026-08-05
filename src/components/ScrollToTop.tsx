@@ -1,38 +1,28 @@
 import { useState, useEffect } from "react";
+import { ChevronUp } from "lucide-react";
 import { Button } from "./ui/button";
-import { ArrowUpToLine } from "lucide-react";
 
 export const ScrollToTop = () => {
-  const [showTopBtn, setShowTopBtn] = useState(false);
+  const [showTop, setShowTop] = useState(false);
 
   useEffect(() => {
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 400) {
-        setShowTopBtn(true);
-      } else {
-        setShowTopBtn(false);
-      }
-    });
+    const handleScroll = () => {
+      setShowTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const goToTop = () => {
-    window.scroll({
-      top: 0,
-      left: 0,
-    });
-  };
+  if (!showTop) return null;
 
   return (
-    <>
-      {showTopBtn && (
-        <Button
-          onClick={goToTop}
-          className="fixed bottom-4 right-4 opacity-90 shadow-md"
-          size="icon"
-        >
-          <ArrowUpToLine className="h-4 w-4" />
-        </Button>
-      )}
-    </>
+    <Button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      size="icon"
+      className="fixed bottom-6 right-6 z-50 rounded-full shadow-lg"
+      aria-label="Scroll to top"
+    >
+      <ChevronUp className="h-5 w-5" />
+    </Button>
   );
 };

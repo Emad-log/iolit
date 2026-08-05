@@ -5,87 +5,61 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-interface FAQProps {
-  question: string;
-  answer: string;
-  value: string;
-}
-
-const FAQList: FAQProps[] = [
+const FAQList = [
   {
-    question: "Is this template free?",
-    answer: "Yes. It is a free ChadcnUI template.",
+    question: "What exactly gets collected?",
+    answer:
+      "Metadata about your sessions — task type, model used, prompt structure, response quality signals. Not your source code, personal identifiers, API keys, or file paths. All PII stripping happens locally.",
     value: "item-1",
   },
   {
-    question: "Lorem ipsum dolor sit amet consectetur adipisicing elit?",
+    question: "How much can I earn?",
     answer:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sint labore quidem quam? Consectetur sapiente iste rerum reiciendis animi nihil nostrum sit quo, modi quod.",
+      "Active developers using Claude, Cursor, or Codex daily can expect $30–$60/month — often covering the full cost of a $20/mo subscription plus extra. Payouts are monthly via Stripe.",
     value: "item-2",
   },
   {
-    question:
-      "Lorem ipsum dolor sit amet  Consectetur natus dolores minus quibusdam?",
+    question: "Who's buying this data?",
     answer:
-      "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Labore qui nostrum reiciendis veritatis necessitatibus maxime quis ipsa vitae cumque quo?",
+      "AI labs, model evaluation companies, and research institutions need real-world usage data to improve their models. They pay for anonymized session metadata that helps them understand how developers actually use AI coding tools.",
     value: "item-3",
   },
   {
-    question: "Lorem ipsum dolor sit amet, consectetur adipisicing elit?",
-    answer: "Lorem ipsum dolor sit amet consectetur, adipisicing elit.",
-    value: "item-4",
-  },
-  {
-    question:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Consectetur natus?",
+    question: "Is the client really open-source?",
     answer:
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sint labore quidem quam? Consectetur sapiente iste rerum reiciendis animi nihil nostrum sit quo, modi quod.",
-    value: "item-5",
+      "Yes, 100%. MIT-licensed, available on GitHub. Read every line, build from source, or audit the PII-stripping logic yourself.",
+    value: "item-4",
   },
 ];
 
 export const FAQ = () => {
   return (
-    <section
-      id="faq"
-      className="container py-24 sm:py-32"
-    >
-      <h2 className="text-3xl md:text-4xl font-bold mb-4">
-        Frequently Asked{" "}
-        <span className="bg-gradient-to-b from-primary/60 to-primary text-transparent bg-clip-text">
+    <section id="faq" className="px-6 py-16">
+      <div className="max-w-xl mx-auto">
+        <h2 className="font-serif text-[28px] tracking-[-0.02em] font-500 mb-8">
           Questions
-        </span>
-      </h2>
+        </h2>
 
-      <Accordion
-        type="single"
-        collapsible
-        className="w-full AccordionRoot"
-      >
-        {FAQList.map(({ question, answer, value }: FAQProps) => (
-          <AccordionItem
-            key={value}
-            value={value}
-          >
-            <AccordionTrigger className="text-left">
-              {question}
-            </AccordionTrigger>
+        <Accordion type="single" collapsible className="w-full">
+          {FAQList.map(({ question, answer, value }) => (
+            <AccordionItem key={value} value={value} className="border-border">
+              <AccordionTrigger className="font-serif text-[16px] font-500 text-left hover:no-underline">
+                {question}
+              </AccordionTrigger>
+              <AccordionContent className="text-[14px] text-muted-foreground leading-relaxed pt-2">
+                {answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
 
-            <AccordionContent>{answer}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-
-      <h3 className="font-medium mt-4">
-        Still have questions?{" "}
-        <a
-          rel="noreferrer noopener"
-          href="#"
-          className="text-primary transition-all border-primary hover:border-b-2"
-        >
-          Contact us
-        </a>
-      </h3>
+        <p className="text-[14px] text-muted-foreground mt-6">
+          Still curious?{" "}
+          <a href="#" className="text-primary font-medium hover:underline underline-offset-4">
+            Get in touch
+          </a>
+        </p>
+      </div>
     </section>
   );
 };

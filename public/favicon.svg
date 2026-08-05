@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#5b21b6"/>
+    </linearGradient>
+  </defs>
+  <!-- Gem shape: iolite crystal point -->
+  <path d="M32 4 L54 22 L48 56 L16 56 L10 22 Z" fill="url(#g)"/>
+  <!-- Facet lines -->
+  <path d="M32 4 L32 56" stroke="rgba(255,255,255,0.35)" stroke-width="2" fill="none"/>
+  <path d="M32 4 L20 40 L32 56" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" fill="none"/>
+  <path d="M32 4 L44 40 L32 56" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" fill="none"/>
+  <!-- Crown highlights -->
+  <path d="M32 4 L54 22 L32 32 Z" fill="rgba(255,255,255,0.16)"/>
+  <path d="M32 4 L10 22 L32 32 Z" fill="rgba(255,255,255,0.07)"/>
+</svg>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { GemMark } from "./GemMark";
 
 export const Newsletter = () => {
   const [email, setEmail] = useState("");
@@ -23,21 +24,23 @@ export const Newsletter = () => {
   };
 
   return (
-    <section id="waitlist" className="relative px-6 py-24 overflow-hidden">
+    <section id="waitlist" className="relative px-6 py-28 overflow-hidden">
       <div className="bloom">
-        <div className="bloom-1" style={{ top: "10%" }} />
-        <div className="bloom-2" style={{ top: "15%" }} />
+        <div className="bloom-1" style={{ top: "-20%" }} />
+        <div className="bloom-2" style={{ top: "-12%" }} />
       </div>
 
       <div className="relative z-10 max-w-xl mx-auto text-center">
-        <h2 className="font-serif text-[36px] tracking-[-0.02em] font-500 leading-[1.1] mb-3">
+        <GemMark className="w-6 h-6 mx-auto mb-6" />
+
+        <h2 className="font-serif text-[36px] md:text-[40px] tracking-[-0.02em] font-500 leading-[1.08] mb-4">
           Ready to start <span className="accent-text italic">earning?</span>
         </h2>
 
-        <p className="text-[15px] text-muted-foreground mb-8 max-w-sm mx-auto">
-          Early waitlist members get a{" "}
+        <p className="text-[15px] text-muted-foreground mb-9 max-w-sm mx-auto">
+          Early members get a{" "}
           <span className="text-primary font-medium">2× earnings bonus</span>{" "}
-          for the first three months.
+          for their first three months.
         </p>
 
         {submitted ? (

@@ -1,16 +1,18 @@
 import { useState } from "react";
+import { GemMark } from "./GemMark";
 
 export const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="relative z-50 px-6 pt-6">
-      <nav className="max-w-xl mx-auto flex items-center justify-between">
-        <a href="/" className="font-serif text-[17px] font-500 tracking-tight">
-          Iolit
+    <header className="fixed top-0 inset-x-0 z-50 px-5 pt-4">
+      <nav className="max-w-6xl mx-auto h-12 px-5 flex items-center justify-between rounded-full bg-card/70 backdrop-blur-md border border-border shadow-[0_1px_2px_rgba(30,20,10,0.04)]">
+        <a href="/" className="flex items-center gap-2">
+          <GemMark />
+          <span className="font-serif text-[16px] font-500 tracking-tight">Iolit</span>
         </a>
 
-        <div className="hidden md:flex items-center gap-7">
+        <div className="hidden md:flex items-center gap-6">
           {["How", "Privacy", "FAQ"].map((item) => (
             <a
               key={item}
@@ -28,7 +30,11 @@ export const Navbar = () => {
           </a>
         </div>
 
-        <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
+        <button
+          className="md:hidden p-1"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Menu"
+        >
           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             {mobileOpen ? <path d="M18 6L6 18M6 6l12 12" /> : <path d="M3 12h18M3 6h18M3 18h18" />}
           </svg>
@@ -36,7 +42,7 @@ export const Navbar = () => {
       </nav>
 
       {mobileOpen && (
-        <nav className="md:hidden max-w-xl mx-auto mt-4 px-6 py-4 rounded-2xl bg-card border border-border flex flex-col gap-2">
+        <nav className="md:hidden max-w-6xl mx-auto mt-2 px-6 py-4 rounded-2xl bg-card border border-border flex flex-col gap-2">
           {["How", "Privacy", "FAQ"].map((item) => (
             <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileOpen(false)}
               className="text-[14px] text-muted-foreground py-1.5">

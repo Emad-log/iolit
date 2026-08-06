@@ -1,37 +1,25 @@
 export const HowItWorks = () => {
   const steps = [
-    { num: "01", title: "Install", desc: "Download for macOS or Linux. Runs silently. No config." },
-    { num: "02", title: "Capture", desc: "Detects your Claude, Cursor, and Codex sessions automatically." },
-    { num: "03", title: "Strip", desc: "All PII removed locally before anything leaves your machine." },
-    { num: "04", title: "Earn", desc: "Monthly payouts via Stripe. Based on session quality and volume." },
+    { num: "01", title: "Install", desc: "A tiny agent for macOS or Linux. Sixty seconds, silent in the background." },
+    { num: "02", title: "Capture", desc: "It notices your Claude, Cursor, and Codex sessions and logs them as anonymized metadata — never your code." },
+    { num: "03", title: "Earn", desc: "Monthly payouts via Stripe, sized by session quality and volume. Enough to cover your subscription, then some." },
   ];
 
   return (
-    <section id="how" className="px-6 py-16">
-      <div className="max-w-xl mx-auto">
-        <h2 className="font-serif text-[28px] tracking-[-0.02em] font-500 mb-10">
+    <section id="how" className="px-6 py-24">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="font-serif text-[30px] md:text-[32px] tracking-[-0.02em] font-500 mb-12 text-center">
           How it works
         </h2>
 
-        <div>
-          {steps.map((step, i) => (
-            <div
-              key={step.num}
-              className={`grid grid-cols-[32px_1fr] gap-6 py-5 ${
-                i !== 0 ? "border-t border-border" : ""
-              }`}
-            >
-              <span className="font-serif text-[14px] font-500 text-primary/40 tabular-nums pt-0.5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {steps.map((step) => (
+            <div key={step.num} className="text-center md:text-left">
+              <span className="font-serif text-[13px] font-500 text-primary/40 tabular-nums block mb-3">
                 {step.num}
               </span>
-              <div>
-                <h3 className="font-serif text-[17px] font-500 mb-0.5">
-                  {step.title}
-                </h3>
-                <p className="text-[14px] text-muted-foreground leading-relaxed">
-                  {step.desc}
-                </p>
-              </div>
+              <h3 className="font-serif text-[20px] font-500 mb-2">{step.title}</h3>
+              <p className="text-[14px] text-muted-foreground leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>

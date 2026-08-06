@@ -9,41 +9,41 @@ const FAQList = [
   {
     question: "What exactly gets collected?",
     answer:
-      "Metadata about your sessions — task type, model used, prompt structure, response quality signals. Not your source code, personal identifiers, API keys, or file paths. All PII stripping happens locally.",
+      "Session metadata only — task type, model used, prompt structure, response quality signals. Never your code, identifiers, API keys, or file paths. PII stripping happens locally, before anything leaves your machine.",
     value: "item-1",
   },
   {
     question: "How much can I earn?",
     answer:
-      "Active developers using Claude, Cursor, or Codex daily can expect $30–$60/month — often covering the full cost of a $20/mo subscription plus extra. Payouts are monthly via Stripe.",
+      "Active daily users of Claude, Cursor, or Codex can expect $30–$60/month — enough to cover a $20 subscription, then some. Payouts are monthly, via Stripe.",
     value: "item-2",
   },
   {
     question: "Who's buying this data?",
     answer:
-      "AI labs, model evaluation companies, and research institutions need real-world usage data to improve their models. They pay for anonymized session metadata that helps them understand how developers actually use AI coding tools.",
+      "AI labs and model-evaluation companies. They pay for anonymized session metadata that shows how developers actually use AI coding tools — what works, what fails, what patterns emerge.",
     value: "item-3",
   },
   {
     question: "Is the client really open-source?",
     answer:
-      "Yes, 100%. MIT-licensed, available on GitHub. Read every line, build from source, or audit the PII-stripping logic yourself.",
+      "Fully. MIT-licensed, on GitHub. Read every line, build from source, audit the PII-stripping logic yourself.",
     value: "item-4",
   },
 ];
 
 export const FAQ = () => {
   return (
-    <section id="faq" className="px-6 py-16">
+    <section id="faq" className="px-6 py-24">
       <div className="max-w-xl mx-auto">
-        <h2 className="font-serif text-[28px] tracking-[-0.02em] font-500 mb-8">
+        <h2 className="font-serif text-[30px] md:text-[32px] tracking-[-0.02em] font-500 mb-10 text-center">
           Questions
         </h2>
 
         <Accordion type="single" collapsible className="w-full">
           {FAQList.map(({ question, answer, value }) => (
             <AccordionItem key={value} value={value} className="border-border">
-              <AccordionTrigger className="font-serif text-[16px] font-500 text-left hover:no-underline">
+              <AccordionTrigger className="font-serif text-[17px] font-500 text-left hover:no-underline">
                 {question}
               </AccordionTrigger>
               <AccordionContent className="text-[14px] text-muted-foreground leading-relaxed pt-2">
@@ -53,7 +53,7 @@ export const FAQ = () => {
           ))}
         </Accordion>
 
-        <p className="text-[14px] text-muted-foreground mt-6">
+        <p className="text-[14px] text-muted-foreground mt-8 text-center">
           Still curious?{" "}
           <a href="#" className="text-primary font-medium hover:underline underline-offset-4">
             Get in touch

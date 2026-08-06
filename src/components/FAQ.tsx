@@ -9,19 +9,19 @@ const FAQList = [
   {
     question: "What exactly gets collected?",
     answer:
-      "Session metadata only — task type, model used, prompt structure, response quality signals. Never your code, identifiers, API keys, or file paths. PII stripping happens locally, before anything leaves your machine.",
+      "Session metadata only: task type, model used, prompt structure, response quality signals. Never your code, identifiers, API keys, or file paths. PII stripping happens locally, before anything leaves your machine.",
     value: "item-1",
   },
   {
     question: "How much can I earn?",
     answer:
-      "Active daily users of Claude, Cursor, or Codex can expect $30–$60/month — enough to cover a $20 subscription, then some. Payouts are monthly, via Stripe.",
+      "Active daily users of Claude, Cursor, or Codex can expect $30-$60/month, enough to cover a $20 subscription, then some. Payouts are monthly, via Stripe.",
     value: "item-2",
   },
   {
     question: "Who's buying this data?",
     answer:
-      "AI labs and model-evaluation companies. They pay for anonymized session metadata that shows how developers actually use AI coding tools — what works, what fails, what patterns emerge.",
+      "AI labs and model-evaluation companies. They pay for anonymized session metadata that shows how developers actually use AI coding tools: what works, what fails, what patterns emerge.",
     value: "item-3",
   },
   {

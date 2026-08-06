@@ -38,7 +38,7 @@ export const Hero = () => {
     { label: "Offered to buyers", value: "+$0.42" },
   ];
 
-  // Streaming demo rows — animate the machinery, not the money
+  // Streaming demo rows, animate the machinery, not the money
   useEffect(() => {
     const t = setInterval(() => setStep((s) => (s + 1) % steps.length), 2200);
     return () => clearInterval(t);
@@ -180,7 +180,7 @@ export const Hero = () => {
               <Sparkline />
             </div>
 
-            {/* streaming activity rows — the demo */}
+            {/* streaming activity rows, the demo */}
             <div className="space-y-2.5">
               {steps.map((s, i) => (
                 <div

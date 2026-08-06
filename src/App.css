@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Iolit — warm sand, violet light, the money is the product */
+/* Iolit, warm sand, violet light, the money is the product */
 @layer base {
   :root {
     --background: 38 40% 95%;

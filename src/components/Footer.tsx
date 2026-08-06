@@ -13,7 +13,7 @@ export const Footer = () => {
             </span>
           </div>
           <div className="flex items-center gap-5 text-[13px] text-muted-foreground">
-            <a href="https://github.com/Emad-log/Lolit" target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors">GitHub</a>
+            <a href="https://github.com/Emad-log/iolit" target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors">GitHub</a>
             <a href="mailto:hello@iolit.dev" className="hover:text-foreground transition-colors">Email</a>
             <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
             <a href="#" className="hover:text-foreground transition-colors">Terms</a>

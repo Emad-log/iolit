@@ -130,7 +130,7 @@ export const Hero = () => {
           </p>
 
           <a
-            href="https://github.com/Emad-log/Lolit"
+            href="https://github.com/Emad-log/iolit"
             target="_blank"
             rel="noreferrer"
             className="rise d5 inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-primary transition-colors mt-5"

@@ -1,7 +1,7 @@
 export const HowItWorks = () => {
   const steps = [
     { num: "01", title: "Install", desc: "A tiny agent for macOS or Linux. Sixty seconds, silent in the background." },
-    { num: "02", title: "Capture", desc: "It notices your Claude, Cursor, and Codex sessions and logs them as anonymized metadata — never your code." },
+    { num: "02", title: "Capture", desc: "It notices your Claude, Cursor, and Codex sessions and logs them as anonymized metadata, never your code." },
     { num: "03", title: "Earn", desc: "Monthly payouts via Stripe, sized by session quality and volume. Enough to cover your subscription, then some." },
   ];
 

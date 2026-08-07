@@ -77,7 +77,6 @@ export const Hero = () => {
         {/* Left: copy */}
         <div className="flex-1 text-center lg:text-left lg:pl-2">
           <div className="rise d1 flex items-center gap-3 justify-center lg:justify-start mb-6">
-            <span className="live-dot h-2 w-2 rounded-full bg-green-500" />
             <span className="text-[12px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
               Now accepting early access
             </span>
@@ -153,7 +152,6 @@ export const Hero = () => {
             {/* header */}
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2">
-                <span className="live-dot h-2 w-2 rounded-full bg-green-500" />
                 <span className="text-[13px] font-medium">Iolit agent</span>
                 <span className="text-[12px] text-muted-foreground">· active</span>
               </div>

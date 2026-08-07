@@ -33,7 +33,7 @@ export const Newsletter = () => {
       <div className="relative z-10 max-w-xl mx-auto text-center">
         <GemMark className="w-6 h-6 mx-auto mb-6" />
 
-        <h2 className="font-serif text-[36px] md:text-[40px] tracking-[-0.02em] font-500 leading-[1.08] mb-4">
+        <h2 className="font-serif text-[28px] sm:text-[36px] md:text-[40px] tracking-[-0.02em] font-500 leading-[1.1] mb-4">
           Ready to start <span className="accent-text italic">earning?</span>
         </h2>
 

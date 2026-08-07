@@ -13,7 +13,7 @@ export const Navbar = () => {
         </a>
 
         <div className="hidden md:flex items-center gap-6">
-          {["How", "Privacy", "FAQ"].map((item) => (
+          {["How", "Privacy"].map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase()}`}
@@ -43,7 +43,7 @@ export const Navbar = () => {
 
       {mobileOpen && (
         <nav className="md:hidden max-w-6xl mx-auto mt-2 px-6 py-4 rounded-2xl bg-card border border-border flex flex-col gap-2">
-          {["How", "Privacy", "FAQ"].map((item) => (
+          {["How", "Privacy"].map((item) => (
             <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileOpen(false)}
               className="text-[14px] text-muted-foreground py-1.5">
               {item}

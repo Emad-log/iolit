@@ -158,17 +158,6 @@
   pointer-events: none;
 }
 
-/* ── live row pulse ────────────────────────────────────── */
-.live-dot { position: relative; display: inline-flex; }
-.live-dot::before {
-  content: ''; position: absolute; inset: -4px; border-radius: 50%;
-  background: #22c55e; opacity: 0.35; animation: live-ping 2s ease-out infinite;
-}
-@keyframes live-ping {
-  0%   { transform: scale(0.6); opacity: 0.5; }
-  100% { transform: scale(2.2); opacity: 0; }
-}
-
 /* sparkline */
 .spark-area { fill: url(#sparkFill); }
 .spark-line { fill: none; stroke: url(#sparkStroke); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }

@@ -53,15 +53,29 @@
   section[id] { scroll-margin-top: 80px; }
 }
 
-/* ── Violet aurora glow (layered blur) ─────────────────── */
+/* ── Violet aurora glow ─────────────────────────────────── */
+/* Radial gradients, not filter blur: identical soft glow, zero GPU cost.
+   Big filter:blur() layers blank pages on mobile compositors. */
 .bloom { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
 .bloom-1, .bloom-2, .bloom-3, .bloom-4 {
   position: absolute; left: 50%; transform: translateX(-50%); border-radius: 50%;
 }
-.bloom-1 { top: -10%; width: 900px; height: 640px; background: #7c3aed; opacity: 0.07; filter: blur(150px); }
-.bloom-2 { top: -4%;  width: 560px; height: 420px; background: #8b5cf6; opacity: 0.10; filter: blur(110px); }
-.bloom-3 { top: 2%;   width: 320px; height: 260px; background: #c4b5fd; opacity: 0.18; filter: blur(80px); }
-.bloom-4 { top: -2%;  width: 200px; height: 200px; background: #a78bfa; opacity: 0.12; filter: blur(56px); }
+.bloom-1 {
+  top: -10%; width: 900px; height: 640px;
+  background: radial-gradient(circle, rgba(124,58,237,0.10) 0%, transparent 70%);
+}
+.bloom-2 {
+  top: -4%; width: 560px; height: 420px;
+  background: radial-gradient(circle, rgba(139,92,246,0.14) 0%, transparent 70%);
+}
+.bloom-3 {
+  top: 2%; width: 320px; height: 260px;
+  background: radial-gradient(circle, rgba(196,181,253,0.22) 0%, transparent 70%);
+}
+.bloom-4 {
+  top: -2%; width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(167,139,250,0.16) 0%, transparent 70%);
+}
 
 /* ── Composition grid: concentric rings ────────────────── */
 .rings { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
@@ -123,10 +137,8 @@
   position: relative;
   width: min(400px, 100%);
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.66);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   box-shadow:
     0 2px 6px rgba(60, 40, 20, 0.04),
     0 24px 60px -12px rgba(109, 40, 217, 0.18),

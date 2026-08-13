@@ -4,6 +4,7 @@ export const Hero = () => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,13 +23,20 @@ export const Hero = () => {
     }
   };
 
+  const copyInstall = () => {
+    navigator.clipboard?.writeText("curl -fsSL iolit.dev/install | sh");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
+    <section className="relative flex flex-col items-center justify-center px-6 pt-20 pb-10 overflow-hidden">
       <div className="relative z-10 max-w-3xl mx-auto text-center">
 
-        <p className="rise d1 text-[12px] uppercase tracking-[0.2em] text-muted-foreground font-medium mb-8">
-          Now accepting early access
-        </p>
+        {/* Stats bar */}
+        <div className="rise d1 mb-8 text-[11px] uppercase tracking-[0.14em] text-muted-foreground/60 font-mono">
+          3 tools · 1 audited call · MIT licensed
+        </div>
 
         <h1 className="rise d2 font-serif text-[44px] sm:text-[56px] md:text-[64px] leading-[1.04] tracking-[-0.025em] font-500 mb-6">
           Your AI subscription
@@ -76,12 +84,15 @@ export const Hero = () => {
           No spam. We email once.
         </p>
 
-        {/* Install command as the hero visual */}
+        {/* Install command with copy button */}
         <div className="rise d5 mt-12 flex flex-col items-center gap-4">
-          <div className="code-block">
+          <button onClick={copyInstall} className="code-block group" style={{ cursor: "pointer" }}>
             <span className="dollar">$</span>
             <span className="cmd">curl -fsSL iolit.dev/install | sh</span>
-          </div>
+            <span className="ml-2 text-[11px] uppercase tracking-wider opacity-50 group-hover:opacity-100 transition-opacity">
+              {copied ? "copied" : "copy"}
+            </span>
+          </button>
           <a
             href="https://github.com/Emad-log/iolit"
             target="_blank"
@@ -97,8 +108,8 @@ export const Hero = () => {
       </div>
 
       {/* bottom strip */}
-      <div className="relative z-10 absolute bottom-0 left-0 right-0 px-6 pb-7">
-        <div className="max-w-6xl mx-auto flex items-center justify-between text-[11px] text-muted-foreground/50">
+      <div className="relative z-10 mt-12 w-full max-w-6xl mx-auto px-0 pb-2">
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground/50 font-mono">
           <span className="uppercase tracking-[0.14em]">Claude · Cursor · Codex</span>
           <span className="hidden sm:inline h-px flex-1 mx-6 bg-border/40" />
           <span className="uppercase tracking-[0.14em]">macOS + Linux</span>

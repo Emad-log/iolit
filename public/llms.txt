@@ -1,0 +1,36 @@
+# Iolit
+
+> Your AI subscription should pay you back.
+
+Iolit is an open-source agent that captures metadata from your AI coding sessions (Claude, Cursor, Codex) and pays you for it. Local capture, consent before anything leaves, one audited network call.
+
+## Install
+
+```sh
+curl -fsSL iolit.dev/install | sh
+```
+
+## How it works
+
+1. Install: a tiny agent for macOS or Linux, silent in the background.
+2. Capture: detects Claude, Cursor, and Codex sessions, extracts metadata only (no code, no prompts, no identifiers).
+3. Earn: monthly payouts via Stripe, sized by session quality and volume.
+
+## Privacy
+
+- The client is MIT-licensed and open source: https://github.com/Emad-log/iolit-client
+- No source code uploaded
+- No personal identifiers transmitted
+- No keystroke logging or screenshots
+- Pause or delete anytime
+- One network call, CI-enforced: `scripts/check-network.js` fails the build if more than one call site exists
+
+## Repos
+
+- Site: https://github.com/Emad-log/iolit
+- Client: https://github.com/Emad-log/iolit-client
+- API: https://github.com/Emad-log/iolit-api
+
+## Contact
+
+Email: ghasemyemad@gmail.com

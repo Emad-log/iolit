@@ -24,27 +24,23 @@ export const Newsletter = () => {
   };
 
   return (
-    <section id="waitlist" className="relative px-6 py-28 overflow-hidden">
-      <div className="bloom">
-        <div className="bloom-1" style={{ top: "-20%" }} />
-        <div className="bloom-2" style={{ top: "-12%" }} />
-      </div>
+    <section id="waitlist" className="px-6 py-32">
+      {/* Asymmetric: content pushed right, not centered */}
+      <div className="max-w-4xl mx-auto md:ml-auto md:mr-0 md:w-2/3">
+        <GemMark className="w-6 h-6 mb-6" />
 
-      <div className="relative z-10 max-w-xl mx-auto text-center">
-        <GemMark className="w-6 h-6 mx-auto mb-6" />
-
-        <h2 className="font-serif text-[28px] sm:text-[36px] md:text-[40px] tracking-[-0.02em] font-500 leading-[1.1] mb-4">
+        <h2 className="font-serif text-[32px] sm:text-[42px] md:text-[48px] tracking-[-0.025em] font-500 leading-[1.06] mb-5">
           Ready to start <span className="accent-text italic">earning?</span>
         </h2>
 
-        <p className="text-[15px] text-muted-foreground mb-9 max-w-sm mx-auto">
+        <p className="text-[16px] text-muted-foreground mb-9 max-w-sm">
           Early members get a{" "}
           <span className="text-primary font-medium">2× earnings bonus</span>{" "}
           for their first three months.
         </p>
 
         {submitted ? (
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center gap-3">
             <svg className="h-5 w-5 text-primary flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6L9 17l-5-5" />
             </svg>
@@ -53,17 +49,17 @@ export const Newsletter = () => {
             </span>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex items-center justify-center gap-2 max-w-sm mx-auto">
+          <form onSubmit={handleSubmit} className="flex items-center gap-2 max-w-sm">
             <input
               type="email"
               required
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 h-12 px-5 text-[14px] rounded-full border border-border bg-card/80 backdrop-blur-sm focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-muted-foreground/50"
+              className="flex-1 h-12 px-5 text-[14px] rounded-full border border-border bg-card/80 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all placeholder:text-muted-foreground/50"
             />
             <button type="submit" className="btn-pill">
-              Claim my spot →
+              Claim my spot
             </button>
           </form>
         )}

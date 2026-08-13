@@ -39,6 +39,8 @@
     --border: 38 22% 86%;
     --input: 38 22% 86%;
     --ring: 262 70% 45%;
+    --ink: 30 22% 10%;
+    --ink-inverted: 38 40% 96%;
   }
 }
 
@@ -51,47 +53,6 @@
   }
   h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-optical-sizing: auto; }
   section[id] { scroll-margin-top: 80px; }
-}
-
-/* ── Violet aurora glow ─────────────────────────────────── */
-/* Radial gradients, not filter blur: identical soft glow, zero GPU cost.
-   Big filter:blur() layers blank pages on mobile compositors. */
-.bloom { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
-.bloom-1, .bloom-2, .bloom-3, .bloom-4 {
-  position: absolute; left: 50%; transform: translateX(-50%); border-radius: 50%;
-}
-.bloom-1 {
-  top: -10%; width: 900px; height: 640px;
-  background: radial-gradient(circle, rgba(124,58,237,0.10) 0%, transparent 70%);
-}
-.bloom-2 {
-  top: -4%; width: 560px; height: 420px;
-  background: radial-gradient(circle, rgba(139,92,246,0.14) 0%, transparent 70%);
-}
-.bloom-3 {
-  top: 2%; width: 320px; height: 260px;
-  background: radial-gradient(circle, rgba(196,181,253,0.22) 0%, transparent 70%);
-}
-.bloom-4 {
-  top: -2%; width: 200px; height: 200px;
-  background: radial-gradient(circle, rgba(167,139,250,0.16) 0%, transparent 70%);
-}
-
-/* ── Composition grid: concentric rings ────────────────── */
-.rings { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
-.rings::before {
-  content: '';
-  position: absolute;
-  left: 50%; top: 46%;
-  width: 170vmax; height: 170vmax;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, transparent 24.9%, #6d28d9 25%, #6d28d9 25.1%, transparent 25.25%),
-    radial-gradient(circle, transparent 32.9%, #6d28d9 33%, #6d28d9 33.1%, transparent 33.25%),
-    radial-gradient(circle, transparent 40.9%, #6d28d9 41%, #6d28d9 41.1%, transparent 41.25%),
-    radial-gradient(circle, transparent 48.9%, #6d28d9 49%, #6d28d9 49.1%, transparent 49.25%);
-  opacity: 0.05;
 }
 
 /* ── Accent text ───────────────────────────────────────── */
@@ -120,6 +81,18 @@
 .btn-pill:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(109,40,217,0.35), inset 0 1px 0 rgba(255,255,255,0.2); }
 .btn-pill:hover::after { left: 125%; }
 
+/* ── Ghost button (light on dark) ──────────────────────── */
+.btn-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  height: 46px; padding: 0 24px; border-radius: 9999px;
+  font-size: 14px; font-weight: 500; white-space: nowrap;
+  background: transparent;
+  color: var(--ink-inverted);
+  border: 1px solid rgba(255,255,255,0.25);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.06); }
+
 /* ── Entrance ──────────────────────────────────────────── */
 @keyframes rise {
   from { opacity: 0; transform: translateY(18px); }
@@ -132,38 +105,53 @@
 .d4 { animation-delay: 0.46s; }
 .d5 { animation-delay: 0.6s; }
 
-/* ── The Earnings Card ─────────────────────────────────── */
-.earn-card {
-  position: relative;
-  width: min(400px, 100%);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  box-shadow:
-    0 2px 6px rgba(60, 40, 20, 0.04),
-    0 24px 60px -12px rgba(109, 40, 217, 0.18),
-    0 8px 24px -8px rgba(60, 40, 20, 0.08);
-  padding: 26px 28px 22px;
-  animation: card-in 1.1s cubic-bezier(0.22, 0.9, 0.3, 1) 0.25s both;
+/* ── Code block (install command) ──────────────────────── */
+.code-block {
+  font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+  font-size: 13px;
+  background: hsl(30 22% 8%);
+  color: hsl(38 30% 85%);
+  padding: 14px 20px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
-@keyframes card-in {
-  from { opacity: 0; transform: translateY(26px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+.code-block .dollar { color: hsl(262 40% 65%); }
+.code-block .cmd { color: hsl(38 30% 90%); }
+
+/* ── Ledger entry motif (privacy row) ──────────────────── */
+.ledger-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  transition: padding-left 0.2s ease;
 }
+.ledger-row:last-child { border-bottom: none; }
+.ledger-row:hover { padding-left: 8px; }
 
-.earn-card::before {
-  content: '';
-  position: absolute; inset: 0; border-radius: 28px;
-  background: linear-gradient(160deg, rgba(196,181,253,0.10) 0%, transparent 40%, rgba(124,58,237,0.06) 100%);
-  pointer-events: none;
+.ledger-stamp {
+  flex-shrink: 0;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: hsl(262 50% 20%);
+  border: 1px solid hsl(262 40% 30%);
+  display: flex; align-items: center; justify-content: center;
 }
+.ledger-stamp svg { width: 16px; height: 16px; stroke: hsl(262 30% 75%); fill: none; stroke-width: 1.5; }
 
-/* sparkline */
-.spark-area { fill: url(#sparkFill); }
-.spark-line { fill: none; stroke: url(#sparkStroke); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-
-/* reveal on scroll */
+/* ── reveal on scroll ──────────────────────────────────── */
 .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s cubic-bezier(0.22,0.9,0.3,1), transform 0.7s cubic-bezier(0.22,0.9,0.3,1); }
 .reveal.is-visible { opacity: 1; transform: none; }
 
 html { scroll-behavior: smooth; }
+
+/* ── Step numbers (how it works) ───────────────────────── */
+.step-num {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1;
+  color: hsl(262 70% 45%);
+  opacity: 0.25;
+}

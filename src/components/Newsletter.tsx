@@ -30,7 +30,7 @@ export const Newsletter = () => {
         <GemMark className="w-6 h-6 mb-6" />
 
         <h2 className="font-serif text-[32px] sm:text-[42px] md:text-[48px] tracking-[-0.025em] font-500 leading-[1.06] mb-5">
-          Ready to start <span className="accent-text italic">earning?</span>
+          Ready to start <span className="accent-text italic" style={{ paddingRight: '0.3em' }}>earning?</span>
         </h2>
 
         <p className="text-[16px] text-muted-foreground mb-9 max-w-sm">

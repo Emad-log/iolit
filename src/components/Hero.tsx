@@ -33,7 +33,7 @@ export const Hero = () => {
         <h1 className="rise d2 font-serif text-[44px] sm:text-[56px] md:text-[64px] leading-[1.04] tracking-[-0.025em] font-500 mb-6">
           Your AI subscription
           <br />
-          should <span className="accent-text italic">pay you back.</span>
+          should <span className="accent-text italic" style={{ paddingRight: '0.3em' }}>pay you back.</span>
         </h1>
 
         <p className="rise d3 text-[17px] text-muted-foreground leading-relaxed mb-10 max-w-lg mx-auto">

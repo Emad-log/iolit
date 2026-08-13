@@ -25,7 +25,7 @@ export const Footer = () => {
           <div className="flex items-center gap-5 text-[13px] text-muted-foreground font-mono">
             <a href="/llms.txt" className="hover:text-foreground transition-colors">llms.txt</a>
             <a href="https://github.com/Emad-log/iolit" target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors">GitHub</a>
-            <a href="mailto:ghasemyemad@gmail.com" className="hover:text-foreground transition-colors">Email</a>
+            <a href="mailto:hello@iolit.dev" className="hover:text-foreground transition-colors">Email</a>
             <a href="/privacy" className="hover:text-foreground transition-colors">Privacy</a>
             <a href="/terms" className="hover:text-foreground transition-colors">Terms</a>
           </div>

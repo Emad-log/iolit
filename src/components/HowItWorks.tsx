@@ -16,7 +16,7 @@ export const HowItWorks = () => {
       num: "03",
       title: "Earn",
       desc: "Monthly payouts via Stripe, sized by session quality and volume.",
-      meta: "~~$20/mo subscription~~ paid by your data",
+      meta: "more data = more $",
     },
   ];
 

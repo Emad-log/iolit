@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Iolit</title>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; background: hsl(38 40% 95%); color: hsl(30 22% 12%); max-width: 680px; margin: 0 auto; padding: 80px 24px; line-height: 1.7; }
+    h1 { font-family: 'Fraunces', Georgia, serif; font-size: 36px; font-weight: 500; margin-bottom: 8px; }
+    h2 { font-family: 'Fraunces', Georgia, serif; font-size: 20px; font-weight: 500; margin-top: 40px; }
+    p, li { font-size: 15px; color: hsl(30 10% 30%); }
+    a { color: hsl(262 70% 45%); }
+    .date { color: hsl(30 10% 50%); font-size: 13px; margin-bottom: 40px; }
+    .back { display: inline-block; margin-bottom: 32px; font-size: 14px; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <a class="back" href="/">← Back to Iolit</a>
+  <h1>Privacy Policy</h1>
+  <p class="date">Last updated: August 13, 2026</p>
+
+  <h2>What we collect</h2>
+  <p>Session metadata only: tool name, model, start time, duration, token counts, task type, success flag, tools used, and hour of day. That's 10 fields. No source code, no prompts, no file paths, no personal identifiers, no keystrokes, no screenshots.</p>
+
+  <h2>How we collect it</h2>
+  <p>The Iolit client runs locally on your machine. It reads session files that already exist on disk (Claude JSONL, Cursor SQLite, Codex JSONL). It extracts metadata and shows you the full batch before sending. Nothing leaves without your explicit approval.</p>
+
+  <h2>One network call</h2>
+  <p>The client makes exactly one network call: sending an approved batch to api.iolit.dev. This is enforced by CI. The source code is public and auditable at <a href="https://github.com/Emad-log/iolit-client" target="_blank" rel="noreferrer">github.com/Emad-log/iolit-client</a>.</p>
+
+  <h2>What happens to your data</h2>
+  <p>Approved batches are stored on our servers and made available to buyers who pay for aggregated, anonymized session metadata. Buyers do not receive your identity. We retain batch data while it has commercial value and delete it on request.</p>
+
+  <h2>Your controls</h2>
+  <ul>
+    <li>Pause capture at any time (the agent stops reading files)</li>
+    <li>Delete previously sent batches (contact us and we'll remove them)</li>
+    <li>Read every line of the client before installing (MIT licensed)</li>
+    <li>Approve each batch individually before it's sent</li>
+  </ul>
+
+  <h2>Waitlist emails</h2>
+  <p>If you join the waitlist, we store your email address and notify you when the product launches. We email once. We don't sell your email to anyone.</p>
+
+  <h2>Contact</h2>
+  <p>Questions? Email <a href="mailto:ghasemyemad@gmail.com">ghasemyemad@gmail.com</a>.</p>
+</body>
+</html>

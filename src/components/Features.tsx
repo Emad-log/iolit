@@ -16,7 +16,7 @@ export const Features = () => {
   return (
     <section id="privacy" className="full-bleed-inverted">
       <div className="px-6 py-32" style={{ background: "hsl(30 22% 8%)" }}>
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           {/* Asymmetric: heading left, copy right */}
           <div className="grid md:grid-cols-2 gap-12 mb-16">
             <div>

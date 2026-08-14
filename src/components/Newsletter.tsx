@@ -25,8 +25,7 @@ export const Newsletter = () => {
 
   return (
     <section id="waitlist" className="px-6 py-32">
-      {/* Asymmetric: content pushed right, not centered */}
-      <div className="max-w-4xl mx-auto md:ml-auto md:mr-0 md:w-2/3">
+      <div className="max-w-3xl mx-auto">
         <GemMark className="w-6 h-6 mb-6" />
 
         <h2 className="font-serif text-[32px] sm:text-[42px] md:text-[48px] tracking-[-0.025em] font-500 leading-[1.06] mb-5">

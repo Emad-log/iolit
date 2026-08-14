@@ -13,7 +13,7 @@ export const Footer = () => {
         </span>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto">
+      <div className="relative z-10 max-w-3xl mx-auto">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <GemMark className="w-4 h-4" />

@@ -108,7 +108,7 @@ export const Hero = () => {
       </div>
 
       {/* bottom strip */}
-      <div className="relative z-10 mt-12 w-full max-w-6xl mx-auto px-0 pb-2">
+      <div className="relative z-10 mt-12 w-full max-w-3xl mx-auto px-0 pb-2">
         <div className="flex items-center justify-between text-[11px] text-muted-foreground/50 font-mono">
           <span className="uppercase tracking-[0.14em]">Claude · Cursor · Codex</span>
           <span className="hidden sm:inline h-px flex-1 mx-6 bg-border/40" />

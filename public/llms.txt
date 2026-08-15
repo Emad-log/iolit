@@ -2,7 +2,7 @@
 
 > Your AI subscription should pay you back.
 
-Iolit is an open-source agent that captures AI coding sessions from Claude, Cursor, Codex, and Copilot. You pick a share tier before anything leaves. One audited network call.
+Iolit is an open-source agent that captures AI coding sessions from Claude, Cursor, and Codex. You pick a share tier before anything leaves. One audited network call.
 
 ## Install
 

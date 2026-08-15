@@ -4,18 +4,18 @@ export const HowItWorks = () => {
       num: "01",
       title: "Install",
       desc: "A tiny agent for macOS or Linux. Sixty seconds, silent in the background.",
-      meta: "npm i -g iolit",
+      meta: "curl -fsSL iolit.dev/install | sh",
     },
     {
       num: "02",
-      title: "Capture",
-      desc: "Detects Claude, Cursor, and Codex sessions. Extracts metadata only, never your code.",
-      meta: "10 fields · no prompts · no paths",
+      title: "Pick a tier",
+      desc: "Pulse is loop stats. Trace adds redacted tool args and results. Raw also includes prompts. You choose every batch.",
+      meta: "pulse · trace · raw",
     },
     {
       num: "03",
       title: "Earn",
-      desc: "Monthly payouts via Stripe, sized by session quality and volume.",
+      desc: "Approve the preview. One audited network call. More you share, more you get paid.",
       meta: "more data = more $",
     },
   ];

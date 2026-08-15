@@ -33,9 +33,8 @@ export const Newsletter = () => {
         </h2>
 
         <p className="text-[16px] text-muted-foreground mb-9 max-w-sm">
-          Early members get a{" "}
-          <span className="text-primary font-medium">2× earnings bonus</span>{" "}
-          for their first three months.
+          Early members pick their share tier on day one.
+          More you share, more you get paid.
         </p>
 
         {submitted ? (

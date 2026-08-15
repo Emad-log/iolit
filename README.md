@@ -2,9 +2,9 @@
 
 Your AI subscription should pay you back.
 
-Iolit is a waitlist site for an open-source agent that captures metadata from
-your AI coding sessions (Claude, Cursor, Codex) and pays you for it. Local
-capture, consent before anything leaves, one audited network call.
+Iolit is a waitlist site for an open-source agent that captures AI coding
+sessions (Claude, Cursor, Codex, Copilot). You pick pulse, trace, or raw
+before anything leaves. One audited network call.
 
 ## Tech
 

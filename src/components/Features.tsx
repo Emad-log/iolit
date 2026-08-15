@@ -1,7 +1,7 @@
 export const Features = () => {
   const guarantees = [
-    { text: "No source code uploaded", icon: "code" },
-    { text: "No personal identifiers transmitted", icon: "id" },
+    { text: "You pick pulse, trace, or raw per batch", icon: "code" },
+    { text: "Secrets stripped. Paths scrubbed on trace and raw", icon: "id" },
     { text: "No keystroke logging or screenshots", icon: "eye" },
     { text: "Pause or delete anytime", icon: "power" },
   ];
@@ -31,8 +31,8 @@ export const Features = () => {
             <div className="md:pt-4">
               <p className="text-[16px] leading-relaxed" style={{ color: "hsl(38 20% 65%)" }}>
                 The client is MIT-licensed and on GitHub. Read every line.
-                Verify there are no hidden calls home. The only network call
-                is the one you approve.
+                Pulse never sends prompts or code. Trace and raw only leave
+                after you approve them. The only network call is the one you pick.
               </p>
             </div>
           </div>

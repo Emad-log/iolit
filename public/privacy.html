@@ -17,23 +17,24 @@
 <body>
   <a class="back" href="/">← Back to Iolit</a>
   <h1>Privacy Policy</h1>
-  <p class="date">Last updated: August 13, 2026</p>
+  <p class="date">Last updated: August 15, 2026</p>
 
   <h2>What we collect</h2>
-  <p>Session metadata only: tool name, model, start time, duration, token counts, task type, success flag, tools used, and hour of day. That's 10 fields. No source code, no prompts, no file paths, no personal identifiers, no keystrokes, no screenshots.</p>
+  <p>You pick a share tier for each batch. Pulse is structured loop stats (model, duration, tokens, tool names, error counts). Trace also includes redacted tool arguments and results. Raw also includes prompt, reply, and thinking previews. Secrets are stripped on every tier. Full file paths are scrubbed on trace and raw.</p>
 
   <h2>How we collect it</h2>
-  <p>The Iolit client runs locally on your machine. It reads session files that already exist on disk (Claude JSONL, Cursor SQLite, Codex JSONL). It extracts metadata and shows you the full batch before sending. Nothing leaves without your explicit approval.</p>
+  <p>The Iolit client runs locally on your machine. It reads session files that already exist on disk (Claude JSONL, Cursor SQLite, Codex JSONL, Copilot chat transcripts). It shows you the tier and the batch before sending. Nothing leaves without your explicit approval. Raw requires typing YES.</p>
 
   <h2>One network call</h2>
-  <p>The client makes exactly one network call: sending an approved batch to api.iolit.dev. This is enforced by CI. The source code is public and auditable at <a href="https://github.com/Emad-log/iolit-client" target="_blank" rel="noreferrer">github.com/Emad-log/iolit-client</a>.</p>
+  <p>The client makes exactly one network call: sending an approved batch to iolit.dev. This is enforced by CI. The source code is public and auditable at <a href="https://github.com/Emad-log/iolit-client" target="_blank" rel="noreferrer">github.com/Emad-log/iolit-client</a>.</p>
 
   <h2>What happens to your data</h2>
-  <p>Approved batches are stored on our servers and made available to buyers who pay for aggregated, anonymized session metadata. Buyers do not receive your identity. We retain batch data while it has commercial value and delete it on request.</p>
+  <p>Approved batches are stored on our servers and made available to buyers. Buyers do not receive your identity. We retain batch data while it has commercial value and delete it on request.</p>
 
   <h2>Your controls</h2>
   <ul>
-    <li>Pause capture at any time (the agent stops reading files)</li>
+    <li>Choose pulse, trace, or raw for each batch</li>
+    <li>Pause capture at any time</li>
     <li>Delete previously sent batches (contact us and we'll remove them)</li>
     <li>Read every line of the client before installing (MIT licensed)</li>
     <li>Approve each batch individually before it's sent</li>

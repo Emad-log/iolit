@@ -34,7 +34,7 @@ export const Hero = () => {
       <div className="relative z-10 max-w-3xl mx-auto text-center">
 
         <div className="rise d1 mb-8 text-[11px] uppercase tracking-[0.14em] text-muted-foreground/60 font-mono">
-          3 tools · 1 audited call · MIT licensed
+          4 tools · 1 audited call · MIT licensed
         </div>
 
         <h1 className="rise d2 font-serif text-[44px] sm:text-[56px] md:text-[64px] leading-[1.04] tracking-[-0.025em] font-500 mb-6">
@@ -44,8 +44,8 @@ export const Hero = () => {
         </h1>
 
         <p className="rise d3 text-[17px] text-muted-foreground leading-relaxed mb-10 max-w-lg mx-auto">
-          A silent agent watches your Claude, Cursor, and Codex sessions,
-          packs the metadata, and pays you every month.
+          A silent agent watches Claude, Cursor, Codex, and Copilot.
+          You pick how much to share. More you share, more you get paid.
         </p>
 
         {submitted ? (
@@ -107,7 +107,7 @@ export const Hero = () => {
 
       <div className="relative z-10 mt-12 w-full max-w-3xl mx-auto px-0 pb-2">
         <div className="flex items-center justify-between text-[11px] text-muted-foreground/50 font-mono">
-          <span className="uppercase tracking-[0.14em]">Claude · Cursor · Codex</span>
+          <span className="uppercase tracking-[0.14em]">Claude · Cursor · Codex · Copilot</span>
           <span className="hidden sm:inline h-px flex-1 mx-6 bg-border/40" />
           <span className="uppercase tracking-[0.14em]">macOS + Linux</span>
         </div>

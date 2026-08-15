@@ -6,7 +6,7 @@ export const Navbar = () => {
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 px-5 pt-4">
-      <nav className="max-w-6xl mx-auto h-12 px-5 flex items-center justify-between rounded-full bg-card/70 backdrop-blur-md border border-border shadow-[0_1px_2px_rgba(30,20,10,0.04)]">
+      <nav className="max-w-3xl mx-auto h-12 px-5 flex items-center justify-between rounded-full bg-card/70 backdrop-blur-md border border-border shadow-[0_1px_2px_rgba(30,20,10,0.04)]">
         <a href="/" className="flex items-center gap-2">
           <GemMark />
           <span className="font-serif text-[16px] font-500 tracking-tight">Iolit</span>
@@ -42,7 +42,7 @@ export const Navbar = () => {
       </nav>
 
       {mobileOpen && (
-        <nav className="md:hidden max-w-6xl mx-auto mt-2 px-6 py-4 rounded-2xl bg-card border border-border flex flex-col gap-2">
+        <nav className="md:hidden max-w-3xl mx-auto mt-2 px-6 py-4 rounded-2xl bg-card border border-border flex flex-col gap-2">
           {["How", "Privacy"].map((item) => (
             <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileOpen(false)}
               className="text-[14px] text-muted-foreground py-1.5">

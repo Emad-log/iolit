@@ -17,7 +17,6 @@ export const Features = () => {
     <section id="privacy" className="full-bleed-inverted">
       <div className="px-6 py-32" style={{ background: "hsl(30 22% 8%)" }}>
         <div className="max-w-3xl mx-auto">
-          {/* Asymmetric: heading left, copy right */}
           <div className="grid md:grid-cols-2 gap-12 mb-16">
             <div>
               <p className="text-[12px] uppercase tracking-[0.2em] mb-4" style={{ color: "hsl(262 30% 65%)" }}>
@@ -38,7 +37,6 @@ export const Features = () => {
             </div>
           </div>
 
-          {/* Ledger entries: stamp + text */}
           <div className="max-w-2xl mx-auto">
             {guarantees.map((g) => (
               <div key={g.text} className="ledger-row">
@@ -54,7 +52,6 @@ export const Features = () => {
             ))}
           </div>
 
-          {/* GitHub link at bottom */}
           <div className="mt-12 text-center">
             <a
               href="https://github.com/Emad-log/iolit-client"

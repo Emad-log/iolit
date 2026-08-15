@@ -33,7 +33,6 @@ export const Hero = () => {
     <section className="relative flex flex-col items-center justify-center px-6 pt-20 pb-10 overflow-hidden">
       <div className="relative z-10 max-w-3xl mx-auto text-center">
 
-        {/* Stats bar */}
         <div className="rise d1 mb-8 text-[11px] uppercase tracking-[0.14em] text-muted-foreground/60 font-mono">
           3 tools · 1 audited call · MIT licensed
         </div>
@@ -84,7 +83,6 @@ export const Hero = () => {
           No spam. We email once.
         </p>
 
-        {/* Install command with copy button */}
         <div className="rise d5 mt-12 flex flex-col items-center gap-4">
           <button onClick={copyInstall} className="code-block group" style={{ cursor: "pointer" }}>
             <span className="dollar">$</span>
@@ -107,7 +105,6 @@ export const Hero = () => {
         </div>
       </div>
 
-      {/* bottom strip */}
       <div className="relative z-10 mt-12 w-full max-w-3xl mx-auto px-0 pb-2">
         <div className="flex items-center justify-between text-[11px] text-muted-foreground/50 font-mono">
           <span className="uppercase tracking-[0.14em]">Claude · Cursor · Codex</span>

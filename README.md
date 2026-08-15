@@ -3,7 +3,7 @@
 Your AI subscription should pay you back.
 
 Iolit is a waitlist site for an open-source agent that captures AI coding
-sessions (Claude, Cursor, Codex, Copilot). You pick pulse, trace, or raw
+sessions (Claude, Cursor, Codex). You pick pulse, trace, or raw
 before anything leaves. One audited network call.
 
 ## Tech

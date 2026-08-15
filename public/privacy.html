@@ -23,7 +23,7 @@
   <p>You pick a share tier for each batch. Pulse is structured loop stats (model, duration, tokens, tool names, error counts). Trace also includes redacted tool arguments and results. Raw also includes prompt, reply, and thinking previews. Secrets are stripped on every tier. Full file paths are scrubbed on trace and raw.</p>
 
   <h2>How we collect it</h2>
-  <p>The Iolit client runs locally on your machine. It reads session files that already exist on disk (Claude JSONL, Cursor SQLite, Codex JSONL, Copilot chat transcripts). It shows you the tier and the batch before sending. Nothing leaves without your explicit approval. Raw requires typing YES.</p>
+  <p>The Iolit client runs locally on your machine. It reads session files that already exist on disk (Claude JSONL, Cursor SQLite, Codex JSONL). It shows you the tier and the batch before sending. Nothing leaves without your explicit approval. Raw requires typing YES.</p>
 
   <h2>One network call</h2>
   <p>The client makes exactly one network call: sending an approved batch to iolit.dev. This is enforced by CI. The source code is public and auditable at <a href="https://github.com/Emad-log/iolit-client" target="_blank" rel="noreferrer">github.com/Emad-log/iolit-client</a>.</p>

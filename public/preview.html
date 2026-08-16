@@ -24,10 +24,18 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { min-height: 100%; }
     body {
-      background: hsl(38 40% 95%);
+      background: #ffffff;
       color: hsl(30 22% 12%);
       font-family: Inter, system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
+    }
+    canvas#world {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
     }
     .banner {
       position: fixed;
@@ -39,19 +47,23 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: hsl(30 10% 50%);
-      background: hsl(38 45% 97% / 0.85);
+      background: rgba(255, 255, 255, 0.85);
       border: 1px solid hsl(38 22% 86%);
       border-radius: 999px;
       padding: 6px 12px;
       z-index: 3;
+      white-space: nowrap;
     }
     .banner a { color: hsl(262 70% 45%); text-decoration: none; }
     main {
-      min-height: 100vh;
+      position: relative;
+      z-index: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 56px 24px 32px;
+      justify-content: center;
+      padding: 64px 24px calc(96px + clamp(96px, 22vh, 150px) + 16px);
+      pointer-events: none;
     }
     .copy {
       width: 100%;
@@ -59,6 +71,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      pointer-events: auto;
     }
     h1 {
       font-family: Fraunces, Georgia, serif;
@@ -80,71 +93,22 @@
       color: hsl(30 10% 36%);
       text-align: center;
       max-width: 340px;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
-    .mine {
-      position: relative;
-      width: min(920px, 100%);
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid hsl(38 22% 82%);
-      box-shadow: 0 20px 44px -20px rgba(46, 16, 91, 0.28);
-      touch-action: manipulation;
-    }
-    canvas#world {
-      display: block;
-      width: 100%;
-      height: clamp(180px, 26vh, 300px);
-      image-rendering: pixelated;
-      touch-action: none;
-    }
-    .hint {
-      margin-top: 10px;
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      color: hsl(30 10% 46%);
-      text-align: center;
-    }
-    .pad {
-      display: none;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 12px;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    @media (hover: none) {
-      .pad { display: flex; }
-    }
-    .pad button {
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 15px;
-      width: 58px;
-      height: 44px;
-      border-radius: 12px;
-      border: 1px solid hsl(38 22% 80%);
-      background: hsl(38 45% 97%);
-      color: hsl(30 22% 20%);
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    .pad button:active { background: hsl(262 70% 45%); color: #faf7f0; }
     form {
       display: flex;
       align-items: center;
       gap: 8px;
       width: 100%;
       max-width: 380px;
-      margin-top: 22px;
     }
     input[type="email"] {
       flex: 1;
       height: 46px;
       padding: 0 18px;
       border-radius: 999px;
-      border: 1px solid hsl(38 22% 80%);
-      background: hsl(38 45% 97%);
+      border: 1px solid hsl(38 22% 82%);
+      background: #ffffff;
       font-size: 14px;
       color: hsl(30 22% 12%);
       outline: none;
@@ -170,7 +134,7 @@
     .err { display: none; font-size: 12px; color: hsl(0 70% 45%); margin-top: 10px; }
     .err.show { display: block; }
     .term {
-      margin-top: 22px;
+      margin-top: 20px;
       font-family: ui-monospace, Menlo, monospace;
       font-size: 13px;
       background: hsl(30 22% 10%);
@@ -182,6 +146,7 @@
       gap: 8px;
       border: 0;
       cursor: pointer;
+      box-shadow: 0 10px 24px -12px rgba(30, 15, 5, 0.35);
     }
     .term .dollar { color: hsl(262 40% 70%); }
     .term .hint {
@@ -199,8 +164,32 @@
       text-transform: uppercase;
       color: hsl(30 10% 44%);
     }
+    .pad {
+      display: none;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 16px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    @media (hover: none) {
+      .pad { display: flex; }
+    }
+    .pad button {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 15px;
+      width: 58px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid hsl(38 22% 82%);
+      background: #ffffff;
+      color: hsl(30 22% 20%);
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .pad button:active { background: hsl(262 70% 45%); color: #faf7f0; }
     footer {
-      margin-top: 22px;
+      margin-top: 18px;
       display: flex;
       gap: 18px;
       font-family: ui-monospace, Menlo, monospace;
@@ -211,25 +200,12 @@
   </style>
 </head>
 <body>
+  <canvas id="world" aria-hidden="true"></canvas>
   <div class="banner">preview · <a href="/">live site</a></div>
   <main>
     <div class="copy">
       <h1>Your AI subscription<br>should <span class="accent">pay you back.</span></h1>
       <p class="sub">A silent agent for Claude, Cursor, and Codex. More you share, more you get paid.</p>
-    </div>
-
-    <div class="mine">
-      <canvas id="world" aria-label="Playable pixel miner game"></canvas>
-    </div>
-    <p class="hint">move ← → · jump ↑ · space: mine / drop</p>
-    <div class="pad">
-      <button id="b-l" aria-label="left">◀</button>
-      <button id="b-j" aria-label="jump">▲</button>
-      <button id="b-m" aria-label="mine">⛏</button>
-      <button id="b-r" aria-label="right">▶</button>
-    </div>
-
-    <div class="copy">
       <form id="form">
         <input type="email" required placeholder="you@example.com" id="email" />
         <button class="btn" type="submit">Join waitlist</button>
@@ -242,6 +218,12 @@
         <span class="hint" id="copied">copy</span>
       </button>
       <p class="tiers">pulse · trace · raw</p>
+      <div class="pad">
+        <button id="b-l" aria-label="left">◀</button>
+        <button id="b-j" aria-label="jump">▲</button>
+        <button id="b-m" aria-label="mine">⛏</button>
+        <button id="b-r" aria-label="right">▶</button>
+      </div>
       <footer>
         <a href="/">live</a>
         <a href="/privacy">privacy</a>
@@ -282,7 +264,7 @@
       trace: { color: "#8b5cf6", hi: "#ddd6fe", coins: 4 },
       raw: { color: "#4c1d95", hi: "#a78bfa", coins: 12 },
     };
-    const ROCK = "#463c33", ROCK_HI = "#5c5145", ROCK_LO = "#241e19";
+    const ROCK = "#e9e4d8", ROCK_HI = "#f6f2e9", ROCK_LO = "#d5cec0", ROCK_LINE = "#b9b0a0";
 
     const cv = document.getElementById("world");
     const g = cv.getContext("2d");
@@ -293,12 +275,13 @@
     let gems = [];
     let particles = [];
     let floats = [];
+    let dust = [];
     let coins = 0, gemsMined = 0;
     let frame = 0;
     let forgeX = 0;
 
     const miner = {
-      x: 32, y: 0, vx: 0, vy: 0,
+      x: 24, y: 0, vx: 0, vy: 0,
       w: 8, h: 12,
       facing: 1, grounded: false,
       mine: 0, walk: 0,
@@ -320,45 +303,52 @@
 
     function layout() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const box = cv.getBoundingClientRect();
-      const w = Math.max(320, box.width);
-      const h = Math.max(160, box.height);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
       cv.width = Math.floor(w * dpr);
       cv.height = Math.floor(h * dpr);
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       W = Math.ceil(w / T) + 1;
       H = Math.ceil(h / T) + 1;
-      floorRow = H - 3;
+      floorRow = H - Math.ceil(clamp(96, h * 0.22, 150) / T) - 1;
       solid = new Uint8Array(W * H);
 
       for (let ty = floorRow; ty < H; ty++) {
         for (let tx = 0; tx < W; tx++) setTile(tx, ty, 1);
       }
-      for (let ty = floorRow - 8; ty < floorRow; ty++) {
-        for (let tx = 0; tx < 2; tx++) setTile(tx, ty, 1);
-      }
-      for (let tx = 9; tx <= 13; tx++) setTile(tx, floorRow - 3, 1);
-      for (let tx = 15; tx <= 19; tx++) setTile(tx, floorRow - 5, 1);
-      for (const tx of [4, 8, 14]) setTile(tx, floorRow - 1, 1);
-      forgeX = (W - 7) * T;
-      for (let tx = W - 7; tx < W - 4; tx++) {
+      const spots = [0.14, 0.3, 0.46, 0.62, 0.78];
+      for (const s of spots) setTile(Math.floor(W * s), floorRow - 1, 1);
+      forgeX = Math.floor(W * 0.9) * T;
+      for (let tx = Math.floor(W * 0.9); tx < Math.floor(W * 0.9) + 3; tx++) {
         setTile(tx, floorRow - 2, 1);
         setTile(tx, floorRow - 1, 1);
       }
 
       gems = [];
-      spawnGem(4, floorRow - 1, "pulse");
-      spawnGem(8, floorRow - 1, "trace");
-      spawnGem(14, floorRow - 1, "raw");
-      spawnGem(11, floorRow - 4, "trace");
-      spawnGem(17, floorRow - 6, "raw");
+      spawnGem(Math.floor(W * 0.14), floorRow - 1, "pulse");
+      spawnGem(Math.floor(W * 0.3), floorRow - 1, "trace");
+      spawnGem(Math.floor(W * 0.46), floorRow - 1, "raw");
+      spawnGem(Math.floor(W * 0.62), floorRow - 1, "trace");
+      spawnGem(Math.floor(W * 0.78), floorRow - 1, "pulse");
 
-      miner.x = T * 2;
+      miner.x = 24;
       miner.y = (floorRow - 1) * T - miner.h - 2;
       miner.vx = 0; miner.vy = 0; miner.carry = [];
       particles = [];
       floats = [];
+
+      dust = [];
+      for (let i = 0; i < 26; i++) {
+        dust.push({
+          x: Math.random() * w,
+          y: Math.random() * (floorRow * T - 20),
+          vx: -0.08 - Math.random() * 0.1,
+          vy: 0.04 + Math.random() * 0.06,
+          s: Math.random() > 0.7 ? 2 : 1,
+        });
+      }
     }
+    function clamp(a, v, b) { return Math.max(a, Math.min(b, v)); }
 
     function spawnGem(tx, ty, tier) {
       gems.push({ tx, ty, tier, state: "wall", crack: 0 });
@@ -397,38 +387,8 @@
     }
     hold("b-l", "l"); hold("b-r", "r"); hold("b-j", "j"); hold("b-m", "m");
 
-    cv.addEventListener("pointerdown", (e) => {
-      const rect = cv.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width * window.innerWidth;
-      const y = (e.clientY - rect.top) / rect.height * window.innerHeight;
-      const mx = miner.x + 4, my = miner.y + 6;
-      touchUser();
-      const [ftx, fty] = frontTile();
-      if (inForge() && miner.carry.length) {
-        mineQueued = true;
-      } else if (gemAt(ftx, fty) && miner.carry.length < 3) {
-        mineQueued = true;
-      } else if (y > my + 4) {
-        keys["ArrowUp"] = true;
-        setTimeout(() => { keys["ArrowUp"] = false; }, 140);
-      } else if (x < mx - 6) {
-        keys["ArrowLeft"] = true;
-        setTimeout(() => { keys["ArrowLeft"] = false; }, 200);
-      } else if (x > mx + 6) {
-        keys["ArrowRight"] = true;
-        setTimeout(() => { keys["ArrowRight"] = false; }, 200);
-      }
-    });
-
     function inForge() {
       return miner.x + miner.w >= forgeX - T * 2 && miner.x <= forgeX + T * 5 && miner.grounded;
-    }
-
-    function frontTile() {
-      const tx = miner.facing === 1
-        ? ((miner.x + miner.w) / T | 0)
-        : ((miner.x - 1) / T | 0);
-      return [tx, ((miner.y + 4) / T) | 0];
     }
 
     function gemAt(tx, ty) {
@@ -444,18 +404,14 @@
       const feet = ((miner.y + miner.h - 2) / T) | 0;
       for (const ty of [head, chest, feet]) {
         const gm = gemAt(tx, ty);
-        if (gm) return { gm, tx, ty };
+        if (gm) return gm;
       }
       return null;
     }
 
-    function chestTy() { return ((miner.y + 4) / T) | 0; }
-    function groundLevel() { return floorRow - 1; }
-
     function autopilot() {
       if (reduce) return;
       if (now() - lastInput < 4200) return;
-      const [ftx, fty] = frontTile();
 
       if (miner.carry.length >= 3 || (miner.carry.length > 0 && !gems.some((gm) => gm.state === "wall"))) {
         if (inForge()) {
@@ -491,8 +447,7 @@
         miner.facing === 1 ? ((miner.x + miner.w) / T | 0) : ((miner.x - 1) / T | 0),
         ((miner.y + miner.h - 2) / T) | 0,
       );
-      const higher = best.ty < ((miner.y + 4) / T) | 0;
-      keys["ArrowUp"] = miner.grounded && (higher || blockedAhead);
+      keys["ArrowUp"] = miner.grounded && blockedAhead;
     }
 
     function update() {
@@ -511,8 +466,8 @@
           if (inForge() && miner.carry.length) {
             deposit();
           } else {
-            const front = gemInFront();
-            if (front && miner.carry.length < 3) {
+            const gem = gemInFront();
+            if (gem && miner.carry.length < 3) {
               miner.mine = 14;
               miner.vx = 0;
             }
@@ -554,9 +509,8 @@
     }
 
     function hitRock() {
-      const front = gemInFront();
-      if (!front || miner.carry.length >= 3) return;
-      const gem = front.gm;
+      const gem = gemInFront();
+      if (!gem || miner.carry.length >= 3) return;
       const px = gem.tx * T + 4, py = gem.ty * T + 4;
       if (gem.crack === 0) {
         gem.crack = 1;
@@ -566,7 +520,7 @@
             vx: (Math.random() - 0.5) * 2.4,
             vy: -Math.random() * 2 - 0.4,
             life: 18 + (Math.random() * 10 | 0),
-            color: i % 2 ? ROCK_HI : ROCK,
+            color: i % 2 ? ROCK_HI : ROCK_LO,
             gold: false,
           });
         }
@@ -588,7 +542,13 @@
         setTimeout(() => {
           gem.state = "done";
           if (!gems.some((gm) => gm.state === "wall")) {
-            const open = [[4, floorRow - 1, "pulse"], [8, floorRow - 1, "trace"], [14, floorRow - 1, "raw"], [11, floorRow - 4, "trace"], [17, floorRow - 6, "raw"]];
+            const open = [
+              [Math.floor(W * 0.14), floorRow - 1, "pulse"],
+              [Math.floor(W * 0.3), floorRow - 1, "trace"],
+              [Math.floor(W * 0.46), floorRow - 1, "raw"],
+              [Math.floor(W * 0.62), floorRow - 1, "trace"],
+              [Math.floor(W * 0.78), floorRow - 1, "pulse"],
+            ];
             for (const [tx, ty, tier] of open) {
               if (!gems.some((gm) => gm.tx === tx && gm.ty === ty && gm.state !== "done")) {
                 setTile(tx, ty, 1);
@@ -640,10 +600,10 @@
       if (swing) {
         if (phase === 0) {
           px(5, -1, 1, 4, "#b8873f");
-          px(2, -3, 4, 1, "#cfd2dd");
+          px(2, -3, 4, 1, "#b9bec9");
         } else if (phase === 1) {
           px(6, -4, 1, 5, "#b8873f");
-          px(3, -5, 4, 1, "#cfd2dd");
+          px(3, -5, 4, 1, "#b9bec9");
         } else {
           px(7, -1, 1, 4, "#b8873f");
           px(4, 1, 4, 1, "#e8ecf5");
@@ -653,20 +613,20 @@
         px(0, 4, 1, 4, "#7a5a2f");
       }
 
-      px(1, 0, 6, 2, "#c9c2d6");
-      px(0, 2, 8, 1, "#9c94b0");
+      px(1, 0, 6, 2, "#d9d2e2");
+      px(0, 2, 8, 1, "#b3aac4");
       px(5, 1, 2, 2, "#ffd54a");
       px(7, 1, 1, 1, "#fff3c4");
       px(1, 3, 6, 2, "#e8b98a");
       px(5, 3, 1, 1, "#241a33");
       px(1, 5, 6, 4, "#5b3f9e");
       px(2, 5, 1, 4, "#3b2a63");
-      px(1, 7, 6, 1, "#241640");
+      px(1, 7, 6, 1, "#2b1f4a");
       const leg = m.grounded && m.vx !== 0 ? (m.walk > 6 ? 0 : 1) : 0;
       px(1, 9, 2, 2 + leg, "#4a2f85");
       px(4, 9, 2, 3 - leg, "#4a2f85");
-      px(1, 11, 2, 1, "#1d1230");
-      px(4, 11, 2, 1, "#1d1230");
+      px(1, 11, 2, 1, "#241a33");
+      px(4, 11, 2, 1, "#241a33");
       g.restore();
 
       for (let i = 0; i < m.carry.length; i++) {
@@ -675,13 +635,6 @@
         px(m.x + 1, gy, 3, 2, tier.color);
         px(m.x + 2, gy - 1, 1, 1, tier.hi);
       }
-
-      const lamX = m.x + (m.facing === 1 ? 9 : -2);
-      const lamp = g.createRadialGradient(lamX, m.y + 2, 1, lamX, m.y + 2, 24);
-      lamp.addColorStop(0, "rgba(255, 214, 90, 0.18)");
-      lamp.addColorStop(1, "rgba(255, 214, 90, 0)");
-      g.fillStyle = lamp;
-      g.fillRect(lamX - 24, m.y - 22, 48, 48);
     }
 
     function drawGem(gm) {
@@ -689,23 +642,24 @@
       const tx = gm.tx * T, ty = gm.ty * T;
       const tier = TIERS[gm.tier];
       const tw = frame % 24 < 3;
-      px(tx + 2, ty + 1, 4, 1, tier.color);
-      px(tx + 1, ty + 2, 6, 2, tier.color);
-      px(tx + 2, ty + 4, 4, 1, tier.color);
-      px(tx + 3, ty + 2, 1, 1, tw ? tier.hi : "#f5f0ff");
+      px(tx + 2, ty - 3, 4, 1, tier.color);
+      px(tx + 1, ty - 2, 6, 2, tier.color);
+      px(tx + 2, ty, 4, 1, tier.color);
+      px(tx + 3, ty - 2, 1, 1, tw ? tier.hi : "#f5f0ff");
       if (gm.crack === 1) {
-        px(tx + 1, ty + 2, 1, 1, "#0f0b16");
-        px(tx + 3, ty + 4, 1, 1, "#0f0b16");
-        px(tx + 5, ty + 1, 1, 1, "#0f0b16");
+        px(tx + 1, ty - 2, 1, 1, "#8d8578");
+        px(tx + 3, ty, 1, 1, "#8d8578");
+        px(tx + 5, ty - 3, 1, 1, "#8d8578");
       }
     }
 
     function drawForge() {
       const fx = forgeX, fy = (floorRow - 2) * T;
       for (let i = 0; i < 3; i++) {
-        px(fx + i * T, fy, T, T, "#3d3229");
-        px(fx + i * T, fy, T, 1, "#54463a");
-        px(fx + i * T, fy + T - 1, T, 1, "#1c1713");
+        px(fx + i * T, fy, T, T, ROCK);
+        px(fx + i * T, fy, T, 1, ROCK_HI);
+        px(fx + i * T, fy + T - 1, T, 1, ROCK_LO);
+        px(fx + i * T, fy, 1, T, ROCK_LINE);
       }
       const fire = frame % 16 < 8;
       px(fx + T, fy - 4, 8, 4, "#6d28d9");
@@ -719,23 +673,20 @@
 
     function drawMarker(x, y) {
       const bob = frame % 40 < 20 ? 0 : 2;
-      g.fillStyle = "rgba(255,255,255,0.85)";
+      g.fillStyle = "rgba(60, 50, 40, 0.55)";
       g.font = "6px ui-monospace, Menlo, monospace";
       g.textAlign = "center";
-      g.fillText("▼", x, y - 6 + bob);
+      g.fillText("▼", x, y - 10 + bob);
       g.textAlign = "left";
     }
 
     function drawWorld() {
       const w = window.innerWidth, h = window.innerHeight;
-      const bg = g.createLinearGradient(0, 0, 0, h);
-      bg.addColorStop(0, "#2b2333");
-      bg.addColorStop(1, "#1c1626");
-      g.fillStyle = bg;
-      g.fillRect(0, 0, w, h);
-      g.fillStyle = "rgba(255,255,255,0.03)";
-      for (let i = 0; i < 40; i++) {
-        g.fillRect((i * 71) % w, (i * 43) % (h * 0.6), 1, 1);
+      g.clearRect(0, 0, w, h);
+
+      for (const d of dust) {
+        g.fillStyle = "rgba(90, 78, 62, 0.10)";
+        g.fillRect(Math.round(d.x), Math.round(d.y), d.s, d.s);
       }
 
       for (let ty = 0; ty < H; ty++) {
@@ -745,7 +696,7 @@
           px(x, y, T, T, ROCK);
           px(x, y, T, 1, ROCK_HI);
           px(x, y + T - 1, T, 1, ROCK_LO);
-          px(x, y, 1, T, "rgba(255,255,255,0.05)");
+          px(x, y, 1, T, ROCK_LINE);
         }
       }
 
@@ -766,7 +717,9 @@
       drawMiner();
 
       const live = gems.filter((gm) => gm.state === "wall");
-      if (!miner.carry.length || miner.carry.length < 3) {
+      if (miner.carry.length >= 3 || !live.length) {
+        if (miner.carry.length) drawMarker(forgeX + T * 2, (floorRow - 2) * T);
+      } else {
         let best = null, bd = 1e9;
         const mx = miner.x + 4, my = miner.y + 6;
         for (const gm of live) {
@@ -774,22 +727,20 @@
           if (d < bd) { bd = d; best = gm; }
         }
         if (best) drawMarker(best.tx * T + 4, best.ty * T);
-      } else {
-        drawMarker(forgeX + T * 2, (floorRow - 2) * T);
       }
 
       g.font = "7px ui-monospace, Menlo, monospace";
       g.textBaseline = "top";
-      g.fillStyle = "rgba(237, 233, 254, 0.85)";
-      g.fillText("gems " + gemsMined + " · coins " + coins, 8, 8);
+      g.fillStyle = "rgba(60, 50, 40, 0.7)";
+      g.fillText("gems " + gemsMined + " · coins " + coins, 10, 10);
       if (miner.carry.length) {
-        g.fillStyle = "rgba(196, 181, 253, 0.8)";
-        g.fillText("haul " + miner.carry.length + "/3", 8, 18);
+        g.fillStyle = "rgba(91, 63, 158, 0.8)";
+        g.fillText("haul " + miner.carry.length + "/3", 10, 20);
       }
 
       for (const f of floats) {
         g.globalAlpha = Math.max(0, f.life / 44);
-        g.fillStyle = "#f5c542";
+        g.fillStyle = "#e6a817";
         g.fillText(f.text, f.x, f.y);
         g.globalAlpha = 1;
       }
@@ -806,6 +757,12 @@
       particles = particles.filter((p) => p.life > 0);
       for (const f of floats) { f.y -= 0.4; f.life -= 1; }
       floats = floats.filter((f) => f.life > 0);
+      for (const d of dust) {
+        d.x += d.vx;
+        d.y += d.vy;
+        if (d.x < -4) d.x = window.innerWidth + 4;
+        if (d.y > floorRow * T - 8) d.y = 4;
+      }
       requestAnimationFrame(loop);
     }
 

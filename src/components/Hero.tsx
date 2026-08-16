@@ -30,7 +30,7 @@ export const Hero = () => {
   };
 
   return (
-    <section className="relative flex flex-col items-center justify-center px-6 pt-20 pb-10 overflow-hidden">
+    <section className="relative flex flex-col items-center justify-center px-6 pt-20 pb-6 overflow-hidden">
       <div className="relative z-10 max-w-3xl mx-auto text-center">
 
         <div className="rise d1 mb-8 text-[11px] uppercase tracking-[0.14em] text-muted-foreground/60 font-mono">

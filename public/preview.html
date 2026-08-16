@@ -62,7 +62,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 64px 24px calc(96px + clamp(96px, 22vh, 150px) + 16px);
+      padding: 64px 24px calc(96px + clamp(140px, 28vh, 240px) + 16px);
       pointer-events: none;
     }
     .copy {
@@ -258,7 +258,8 @@
       }
     });
 
-    const T = 16;
+    const T = 12;
+    const S = 2;
     const TIERS = {
       pulse: { color: "#c4b5fd", mid: "#a78bfa", dark: "#6d28d9", hi: "#ffffff", coins: 1 },
       trace: { color: "#a78bfa", mid: "#8b5cf6", dark: "#5b21b6", hi: "#ffffff", coins: 4 },
@@ -304,14 +305,14 @@
 
     function layout() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      cv.width = Math.floor(w * dpr);
-      cv.height = Math.floor(h * dpr);
-      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const w = window.innerWidth / S;
+      const h = window.innerHeight / S;
+      cv.width = Math.floor(window.innerWidth * dpr);
+      cv.height = Math.floor(window.innerHeight * dpr);
+      g.setTransform(dpr * S, 0, 0, dpr * S, 0, 0);
       W = Math.ceil(w / T) + 1;
       H = Math.ceil(h / T) + 1;
-      floorRow = H - Math.ceil(clamp(96, h * 0.24, 160) / T) - 1;
+      floorRow = H - Math.ceil(clamp(70, h * 0.28, 120) / T) - 1;
       solid = new Uint8Array(W * H);
 
       for (let ty = floorRow; ty < H; ty++) {
@@ -350,6 +351,7 @@
         });
       }
     }
+
     function clamp(a, v, b) { return Math.max(a, Math.min(b, v)); }
 
     function spawnGem(tx, ty, tier) {
@@ -459,8 +461,8 @@
         miner.vx = 0;
       } else {
         miner.vx = 0;
-        if (keys["ArrowLeft"]) { miner.vx = -1.5; miner.facing = -1; }
-        if (keys["ArrowRight"]) { miner.vx = 1.5; miner.facing = 1; }
+        if (keys["ArrowLeft"]) { miner.vx = -2; miner.facing = -1; }
+        if (keys["ArrowRight"]) { miner.vx = 2; miner.facing = 1; }
         if (miner.vx !== 0 && miner.grounded) miner.walk = (miner.walk + 1) % 16;
 
         if (mineQueued && miner.grounded) {
@@ -478,8 +480,8 @@
       }
       mineQueued = false;
 
-      miner.vy = Math.min(5.4, miner.vy + 0.34);
-      if (keys["ArrowUp"] && miner.grounded) { miner.vy = -5.6; miner.grounded = false; }
+      miner.vy = Math.min(6.5, miner.vy + 0.42);
+      if (keys["ArrowUp"] && miner.grounded) { miner.vy = -6.4; miner.grounded = false; }
 
       miner.x += miner.vx;
       if (miner.vx < 0) {
@@ -489,7 +491,7 @@
         const t = ((miner.x + miner.w) / T) | 0;
         if (tile(t, (miner.y / T) | 0) || tile(t, ((miner.y + miner.h - 1) / T) | 0)) miner.x = t * T - miner.w;
       }
-      miner.x = Math.max(T, Math.min(window.innerWidth - miner.w - T, miner.x));
+      miner.x = Math.max(T, Math.min(window.innerWidth / S - miner.w - T, miner.x));
 
       miner.y += miner.vy;
       if (miner.vy < 0) {
@@ -790,7 +792,7 @@
     }
 
     function drawWorld() {
-      const w = window.innerWidth, h = window.innerHeight;
+      const w = window.innerWidth / S, h = window.innerHeight / S;
       g.clearRect(0, 0, w, h);
 
       for (const d of dust) {
@@ -871,7 +873,7 @@
       drawWorld();
       frame += 1;
       for (const p of particles) {
-        p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= 1;
+        p.x += p.vx; p.y += p.vy; p.vy += 0.14; p.life -= 1;
       }
       particles = particles.filter((p) => p.life > 0);
       for (const f of floats) { f.y -= 0.4; f.life -= 1; }
@@ -879,7 +881,7 @@
       for (const d of dust) {
         d.x += d.vx;
         d.y += d.vy;
-        if (d.x < -4) d.x = window.innerWidth + 4;
+        if (d.x < -4) d.x = window.innerWidth / S + 4;
         if (d.y > floorRow * T - 12) d.y = 4;
       }
       for (const s of smoke) {

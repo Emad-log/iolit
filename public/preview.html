@@ -29,6 +29,14 @@
       font-family: Inter, system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
+    canvas#field {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
     .banner {
       position: fixed;
       top: 14px;
@@ -39,7 +47,7 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: hsl(30 10% 50%);
-      background: hsl(38 45% 97%);
+      background: hsl(38 45% 97% / 0.82);
       border: 1px solid hsl(38 22% 86%);
       border-radius: 999px;
       padding: 6px 12px;
@@ -47,28 +55,14 @@
     }
     .banner a { color: hsl(262 70% 45%); text-decoration: none; }
     main {
+      position: relative;
+      z-index: 1;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 88px 24px 56px;
-    }
-    .gem {
-      width: 44px;
-      height: 44px;
-      margin-bottom: 28px;
-      filter: drop-shadow(0 2px 2px rgba(40, 20, 10, 0.18));
-    }
-    .gem svg { width: 100%; height: 100%; display: block; }
-    .facet {
-      mix-blend-mode: screen;
-      animation: catch 7s ease-in-out infinite;
-    }
-    @keyframes catch {
-      0%, 100% { opacity: 0.15; }
-      45% { opacity: 0.85; }
-      60% { opacity: 0.2; }
     }
     h1 {
       font-family: Fraunces, Georgia, serif;
@@ -80,17 +74,14 @@
       margin-bottom: 14px;
     }
     .accent {
-      background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 60%, #5b21b6 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      color: hsl(262 70% 40%);
       font-style: italic;
       padding-right: 0.3em;
     }
     .sub {
       font-size: 16px;
       line-height: 1.55;
-      color: hsl(30 10% 42%);
+      color: hsl(30 10% 32%);
       text-align: center;
       max-width: 360px;
       margin-bottom: 28px;
@@ -107,8 +98,8 @@
       height: 46px;
       padding: 0 18px;
       border-radius: 999px;
-      border: 1px solid hsl(38 22% 86%);
-      background: hsl(38 45% 97%);
+      border: 1px solid hsl(38 22% 78%);
+      background: hsl(38 45% 97% / 0.88);
       font-size: 14px;
       color: hsl(30 22% 12%);
       outline: none;
@@ -123,17 +114,13 @@
       border: 0;
       border-radius: 999px;
       color: #faf7f0;
-      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      background: hsl(262 70% 45%);
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
       white-space: nowrap;
     }
-    .ok {
-      display: none;
-      font-size: 15px;
-      font-weight: 500;
-    }
+    .ok { display: none; font-size: 15px; font-weight: 500; }
     .ok.show { display: block; }
     .err { display: none; font-size: 12px; color: hsl(0 70% 45%); margin-top: 10px; }
     .err.show { display: block; }
@@ -141,7 +128,7 @@
       margin-top: 40px;
       font-family: ui-monospace, Menlo, monospace;
       font-size: 13px;
-      background: hsl(30 22% 8%);
+      background: hsl(30 22% 10% / 0.92);
       color: hsl(38 30% 90%);
       padding: 14px 18px;
       border-radius: 12px;
@@ -150,26 +137,10 @@
       gap: 8px;
       border: 0;
       cursor: pointer;
-      min-width: 320px;
     }
-    .term .dollar { color: hsl(262 40% 65%); }
-    .term .cmd { min-width: 15ch; }
-    .term .cursor {
-      display: inline-block;
-      width: 7px;
-      height: 13px;
-      background: hsl(262 40% 70%);
-      margin-left: 1px;
-      vertical-align: -1px;
-      animation: blink 1s steps(1) infinite;
-    }
-    .term.done .cursor { display: none; }
-    @keyframes blink {
-      0%, 49% { opacity: 1; }
-      50%, 100% { opacity: 0; }
-    }
+    .term .dollar { color: hsl(262 40% 70%); }
     .term .hint {
-      margin-left: auto;
+      margin-left: 10px;
       font-size: 11px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -181,7 +152,7 @@
       font-size: 11px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: hsl(30 10% 50%);
+      color: hsl(30 10% 42%);
     }
     footer {
       margin-top: 64px;
@@ -190,30 +161,14 @@
       font-family: ui-monospace, Menlo, monospace;
       font-size: 12px;
     }
-    footer a { color: hsl(30 10% 50%); text-decoration: none; }
+    footer a { color: hsl(30 10% 42%); text-decoration: none; }
     footer a:hover { color: hsl(262 70% 45%); }
   </style>
 </head>
 <body>
+  <canvas id="field" aria-hidden="true"></canvas>
   <div class="banner">preview · <a href="/">live site</a></div>
   <main>
-    <div class="gem" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none">
-        <defs>
-          <linearGradient id="g" x1="0" y1="0" x2="24" y2="24">
-            <stop stop-color="#a78bfa" />
-            <stop offset="1" stop-color="#6d28d9" />
-          </linearGradient>
-        </defs>
-        <path d="M12 3 L19 9 L12 21 L5 9 Z" fill="url(#g)" />
-        <path d="M12 3 L12 12 L5 9 Z" fill="rgba(255,255,255,0.25)" />
-        <path d="M12 3 L12 12 L19 9 Z" fill="rgba(255,255,255,0.1)" />
-        <path d="M12 12 L5 9 L12 21 Z" fill="rgba(0,0,0,0.08)" />
-        <path d="M12 12 L19 9 L12 21 Z" fill="rgba(0,0,0,0.03)" />
-        <path class="facet" d="M8.2 7.6 L12 4.4 L11.2 9.2 Z" fill="rgba(255,255,255,0.9)" />
-      </svg>
-    </div>
-
     <h1>Your AI subscription<br>should <span class="accent">pay you back.</span></h1>
     <p class="sub">A silent agent for Claude, Cursor, and Codex. More you share, more you get paid.</p>
 
@@ -226,8 +181,7 @@
 
     <button class="term" id="copy" type="button">
       <span class="dollar">$</span>
-      <span class="cmd" id="cmd"></span>
-      <span class="cursor" id="caret"></span>
+      <span>curl -fsSL iolit.dev/install | sh</span>
       <span class="hint" id="copied">copy</span>
     </button>
     <p class="tiers">pulse · trace · raw</p>
@@ -240,40 +194,22 @@
     </footer>
   </main>
   <script>
-    const text = "curl -fsSL iolit.dev/install | sh";
-    const cmd = document.getElementById("cmd");
-    const term = document.getElementById("copy");
-    let n = 0;
-    function type() {
-      if (n <= text.length) {
-        cmd.textContent = text.slice(0, n);
-        n += 1;
-        setTimeout(type, n < 4 ? 180 : 28);
-      } else {
-        term.classList.add("done");
-      }
-    }
-    setTimeout(type, 420);
-
+    const INSTALL = "curl -fsSL iolit.dev/install | sh";
     document.getElementById("copy").addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch {}
+      try { await navigator.clipboard.writeText(INSTALL); } catch {}
       const hint = document.getElementById("copied");
       hint.textContent = "copied";
       setTimeout(() => { hint.textContent = "copy"; }, 1600);
     });
-
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = document.getElementById("email").value;
       const err = document.getElementById("err");
       err.classList.remove("show");
       try {
         const res = await fetch("/api/waitlist", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, source: "preview" }),
+          body: JSON.stringify({ email: document.getElementById("email").value, source: "preview" }),
         });
         if (!res.ok) throw new Error("bad");
         document.getElementById("form").style.display = "none";
@@ -281,6 +217,193 @@
       } catch {
         err.classList.add("show");
       }
+    });
+
+    // Whole screen is bits. The gem is only which bits light up.
+    const V = {
+      n: [0, 1.05, 0.02],
+      e: [0.9, 0.14, 0.02],
+      s: [0, -1.22, 0.02],
+      w: [-0.9, 0.14, 0.02],
+      f: [0, 0.06, 0.58],
+      b: [0, 0.06, -0.48],
+    };
+    const FACETS = [
+      ["n", "e", "f"],
+      ["e", "s", "f"],
+      ["s", "w", "f"],
+      ["w", "n", "f"],
+      ["n", "b", "e"],
+      ["e", "b", "s"],
+      ["s", "b", "w"],
+      ["w", "b", "n"],
+    ];
+    const LIGHT = norm([-0.58, 0.74, 0.36]);
+
+    function norm(v) {
+      const l = Math.hypot(v[0], v[1], v[2]) || 1;
+      return [v[0] / l, v[1] / l, v[2] / l];
+    }
+    function sub(a, b) { return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]; }
+    function cross(a, b) {
+      return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+    }
+    function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+    function rotX(p, a) {
+      const c = Math.cos(a), s = Math.sin(a);
+      return [p[0], p[1] * c - p[2] * s, p[1] * s + p[2] * c];
+    }
+    function rotY(p, a) {
+      const c = Math.cos(a), s = Math.sin(a);
+      return [p[0] * c + p[2] * s, p[1], -p[0] * s + p[2] * c];
+    }
+    function hash(i, j, s) {
+      let n = (i * 374761393 + j * 668265263 + s * 1440662637) >>> 0;
+      n = Math.imul(n ^ (n >>> 13), 1274126177);
+      return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
+    }
+    function bary(p, a, b, c) {
+      const v0x = b[0] - a[0], v0y = b[1] - a[1];
+      const v1x = c[0] - a[0], v1y = c[1] - a[1];
+      const v2x = p[0] - a[0], v2y = p[1] - a[1];
+      const den = v0x * v1y - v1x * v0y;
+      if (Math.abs(den) < 1e-6) return null;
+      const v = (v2x * v1y - v1x * v2y) / den;
+      const w = (v0x * v2y - v2x * v0y) / den;
+      const u = 1 - v - w;
+      if (u < -0.008 || v < -0.008 || w < -0.008) return null;
+      return [u, v, w];
+    }
+    function distEdge(px, py, a, b) {
+      const x = b[0] - a[0], y = b[1] - a[1];
+      const len2 = x * x + y * y || 1;
+      const t = Math.max(0, Math.min(1, ((px - a[0]) * x + (py - a[1]) * y) / len2));
+      return Math.hypot(px - (a[0] + x * t), py - (a[1] + y * t));
+    }
+
+    const canvas = document.getElementById("field");
+    const ctx = canvas.getContext("2d", { alpha: false });
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let cell = 12;
+    let cols = 0;
+    let rows = 0;
+    let bits = [];
+
+    function layout() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cell = w < 640 ? 11 : 13;
+      cols = Math.ceil(w / cell) + 1;
+      rows = Math.ceil(h / cell) + 1;
+      bits = new Array(cols * rows);
+      for (let j = 0; j < rows; j++) {
+        for (let i = 0; i < cols; i++) bits[j * cols + i] = hash(i, j, 1) > 0.5 ? "1" : "0";
+      }
+    }
+
+    function project(p, w, h, scale) {
+      const z = p[2] + 3.05;
+      const f = scale / z;
+      return [w * 0.5 + p[0] * f, h * 0.46 - p[1] * f, p[2]];
+    }
+
+    function mesh(t) {
+      const yaw = reduce ? -0.42 : -0.34 + Math.sin(t / 7000) * 0.38;
+      const pitch = 0.34 + (reduce ? 0 : Math.sin(t / 10400) * 0.05);
+      const pts = {};
+      for (const k of Object.keys(V)) pts[k] = rotY(rotX(V[k], pitch), yaw);
+      const faces = [];
+      for (const keys of FACETS) {
+        const a = pts[keys[0]], b = pts[keys[1]], c = pts[keys[2]];
+        const n = norm(cross(sub(b, a), sub(c, a)));
+        if (n[2] <= 0.02) continue;
+        const lambert = Math.max(0, dot(n, LIGHT));
+        const spec = Math.pow(Math.max(0, 0.55 * lambert + 0.45 * n[2]), 14);
+        faces.push({
+          a, b, c,
+          lit: 0.12 + lambert * 0.78 + spec * 0.42,
+          hue: 256 + (1 - lambert) * 14,
+          z: (a[2] + b[2] + c[2]) / 3,
+        });
+      }
+      faces.sort((x, y) => x.z - y.z);
+      return faces;
+    }
+
+    function draw(t) {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      ctx.fillStyle = "hsl(38, 40%, 95%)";
+      ctx.fillRect(0, 0, w, h);
+
+      const scale = Math.min(w, h) * 1.18;
+      const faces = mesh(t).map((f) => ({
+        ...f,
+        pa: project(f.a, w, h, scale),
+        pb: project(f.b, w, h, scale),
+        pc: project(f.c, w, h, scale),
+      }));
+
+      ctx.font = "600 " + Math.round(cell * 0.86) + "px ui-monospace, Menlo, monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const tick = reduce ? 0 : ((t / 680) | 0);
+      const cx = w * 0.5;
+      const cy = h * 0.42;
+
+      for (let j = 0; j < rows; j++) {
+        for (let i = 0; i < cols; i++) {
+          const px = (i + 0.5) * cell;
+          const py = (j + 0.5) * cell;
+          let hit = null;
+          for (let k = faces.length - 1; k >= 0; k--) {
+            if (bary([px, py], faces[k].pa, faces[k].pb, faces[k].pc)) {
+              hit = faces[k];
+              break;
+            }
+          }
+
+          let bit = bits[j * cols + i];
+          if (!reduce && hash(i, j, tick) > 0.993) bit = bit === "1" ? "0" : "1";
+
+          if (hit) {
+            const edge = Math.min(
+              distEdge(px, py, hit.pa, hit.pb),
+              distEdge(px, py, hit.pb, hit.pc),
+              distEdge(px, py, hit.pc, hit.pa),
+            );
+            const ridge = edge < cell * 0.5;
+            const lit = Math.min(1, hit.lit + (ridge ? 0.16 : 0));
+            const alpha = 0.28 + lit * 0.46;
+            const lite = 24 + lit * 40;
+            ctx.fillStyle = "hsla(" + hit.hue.toFixed(0) + ", 58%, " + lite.toFixed(0) + "%, " + alpha.toFixed(3) + ")";
+          } else {
+            const d = Math.hypot((px - cx) / w, (py - cy) / h);
+            const alpha = 0.055 + Math.max(0, 0.04 - d * 0.06);
+            ctx.fillStyle = "hsla(30, 12%, 28%, " + alpha.toFixed(3) + ")";
+          }
+          ctx.fillText(bit, px, py);
+        }
+      }
+    }
+
+    layout();
+    if (reduce) draw(0);
+    else {
+      const tick = (now) => {
+        draw(now);
+        requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+    window.addEventListener("resize", () => {
+      layout();
+      if (reduce) draw(0);
     });
   </script>
 </body>

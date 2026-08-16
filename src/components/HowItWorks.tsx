@@ -29,7 +29,7 @@ export const HowItWorks = () => {
   ];
 
   return (
-    <section id="how" className="px-6 pt-16 pb-24">
+    <section id="how" className="px-6 pt-8 pb-24">
       <div className="max-w-3xl mx-auto">
         <h2 className="font-serif text-[28px] md:text-[36px] tracking-[-0.025em] font-500 mb-16">
           How it works

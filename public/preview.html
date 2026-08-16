@@ -258,13 +258,13 @@
       }
     });
 
-    const T = 8;
+    const T = 16;
     const TIERS = {
-      pulse: { color: "#c4b5fd", hi: "#ede9fe", coins: 1 },
-      trace: { color: "#8b5cf6", hi: "#ddd6fe", coins: 4 },
-      raw: { color: "#4c1d95", hi: "#a78bfa", coins: 12 },
+      pulse: { color: "#c4b5fd", mid: "#a78bfa", dark: "#6d28d9", hi: "#ffffff", coins: 1 },
+      trace: { color: "#a78bfa", mid: "#8b5cf6", dark: "#5b21b6", hi: "#ffffff", coins: 4 },
+      raw: { color: "#7c3aed", mid: "#5b21b6", dark: "#3b0a63", hi: "#ffffff", coins: 12 },
     };
-    const ROCK = "#e9e4d8", ROCK_HI = "#f6f2e9", ROCK_LO = "#d5cec0", ROCK_LINE = "#b9b0a0";
+    const ROCK = "#e7e1d3", ROCK_HI = "#f7f3ea", ROCK_LO = "#cfc7b7", ROCK_LINE = "#b4aa97";
 
     const cv = document.getElementById("world");
     const g = cv.getContext("2d");
@@ -276,13 +276,14 @@
     let particles = [];
     let floats = [];
     let dust = [];
+    let smoke = [];
     let coins = 0, gemsMined = 0;
     let frame = 0;
     let forgeX = 0;
 
     const miner = {
       x: 24, y: 0, vx: 0, vy: 0,
-      w: 8, h: 12,
+      w: 14, h: 18,
       facing: 1, grounded: false,
       mine: 0, walk: 0,
       carry: [],
@@ -310,7 +311,7 @@
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       W = Math.ceil(w / T) + 1;
       H = Math.ceil(h / T) + 1;
-      floorRow = H - Math.ceil(clamp(96, h * 0.22, 150) / T) - 1;
+      floorRow = H - Math.ceil(clamp(96, h * 0.24, 160) / T) - 1;
       solid = new Uint8Array(W * H);
 
       for (let ty = floorRow; ty < H; ty++) {
@@ -318,8 +319,8 @@
       }
       const spots = [0.14, 0.3, 0.46, 0.62, 0.78];
       for (const s of spots) setTile(Math.floor(W * s), floorRow - 1, 1);
-      forgeX = Math.floor(W * 0.9) * T;
-      for (let tx = Math.floor(W * 0.9); tx < Math.floor(W * 0.9) + 3; tx++) {
+      forgeX = Math.floor(W * 0.88) * T;
+      for (let tx = Math.floor(W * 0.88); tx < Math.floor(W * 0.88) + 3; tx++) {
         setTile(tx, floorRow - 2, 1);
         setTile(tx, floorRow - 1, 1);
       }
@@ -336,15 +337,16 @@
       miner.vx = 0; miner.vy = 0; miner.carry = [];
       particles = [];
       floats = [];
+      smoke = [];
 
       dust = [];
-      for (let i = 0; i < 26; i++) {
+      for (let i = 0; i < 22; i++) {
         dust.push({
           x: Math.random() * w,
-          y: Math.random() * (floorRow * T - 20),
-          vx: -0.08 - Math.random() * 0.1,
-          vy: 0.04 + Math.random() * 0.06,
-          s: Math.random() > 0.7 ? 2 : 1,
+          y: Math.random() * (floorRow * T - 24),
+          vx: -0.06 - Math.random() * 0.1,
+          vy: 0.03 + Math.random() * 0.05,
+          s: Math.random() > 0.6 ? 2 : 1,
         });
       }
     }
@@ -400,7 +402,7 @@
         ? ((miner.x + miner.w) / T | 0)
         : ((miner.x - 1) / T | 0);
       const head = (miner.y / T) | 0;
-      const chest = ((miner.y + 4) / T) | 0;
+      const chest = ((miner.y + 6) / T) | 0;
       const feet = ((miner.y + miner.h - 2) / T) | 0;
       for (const ty of [head, chest, feet]) {
         const gm = gemAt(tx, ty);
@@ -427,9 +429,9 @@
       const live = gems.filter((gm) => gm.state === "wall");
       if (!live.length) return;
       let best = null, bd = 1e9;
-      const mx = miner.x + 4, my = miner.y + 6;
+      const mx = miner.x + 7, my = miner.y + 9;
       for (const gm of live) {
-        const d = Math.abs(gm.tx * T + 4 - mx) + Math.abs(gm.ty * T + 4 - my);
+        const d = Math.abs(gm.tx * T + 8 - mx) + Math.abs(gm.ty * T + 8 - my);
         if (d < bd) { bd = d; best = gm; }
       }
       if (!best) return;
@@ -439,10 +441,10 @@
         return;
       }
 
-      const tx = best.tx * T + 4;
+      const tx = best.tx * T + 8;
       miner.facing = tx >= mx ? 1 : -1;
-      keys["ArrowLeft"] = tx < mx - 3;
-      keys["ArrowRight"] = tx > mx + 3;
+      keys["ArrowLeft"] = tx < mx - 4;
+      keys["ArrowRight"] = tx > mx + 4;
       const blockedAhead = tile(
         miner.facing === 1 ? ((miner.x + miner.w) / T | 0) : ((miner.x - 1) / T | 0),
         ((miner.y + miner.h - 2) / T) | 0,
@@ -459,7 +461,7 @@
         miner.vx = 0;
         if (keys["ArrowLeft"]) { miner.vx = -1.5; miner.facing = -1; }
         if (keys["ArrowRight"]) { miner.vx = 1.5; miner.facing = 1; }
-        if (miner.vx !== 0 && miner.grounded) miner.walk = (miner.walk + 1) % 14;
+        if (miner.vx !== 0 && miner.grounded) miner.walk = (miner.walk + 1) % 16;
 
         if (mineQueued && miner.grounded) {
           mineQueued = false;
@@ -468,7 +470,7 @@
           } else {
             const gem = gemInFront();
             if (gem && miner.carry.length < 3) {
-              miner.mine = 14;
+              miner.mine = 16;
               miner.vx = 0;
             }
           }
@@ -476,8 +478,8 @@
       }
       mineQueued = false;
 
-      miner.vy = Math.min(5, miner.vy + 0.34);
-      if (keys["ArrowUp"] && miner.grounded) { miner.vy = -4.9; miner.grounded = false; }
+      miner.vy = Math.min(5.4, miner.vy + 0.34);
+      if (keys["ArrowUp"] && miner.grounded) { miner.vy = -5.6; miner.grounded = false; }
 
       miner.x += miner.vx;
       if (miner.vx < 0) {
@@ -511,17 +513,18 @@
     function hitRock() {
       const gem = gemInFront();
       if (!gem || miner.carry.length >= 3) return;
-      const px = gem.tx * T + 4, py = gem.ty * T + 4;
+      const px = gem.tx * T + 8, py = gem.ty * T + 8;
       if (gem.crack === 0) {
         gem.crack = 1;
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 8; i++) {
           particles.push({
-            x: px, y: py,
-            vx: (Math.random() - 0.5) * 2.4,
-            vy: -Math.random() * 2 - 0.4,
-            life: 18 + (Math.random() * 10 | 0),
+            x: px, y: py - 4,
+            vx: (Math.random() - 0.5) * 3,
+            vy: -Math.random() * 2.6 - 0.5,
+            life: 22 + (Math.random() * 12 | 0),
             color: i % 2 ? ROCK_HI : ROCK_LO,
             gold: false,
+            size: Math.random() > 0.5 ? 3 : 2,
           });
         }
       } else {
@@ -529,14 +532,15 @@
         miner.carry.push(gem.tier);
         gemsMined += 1;
         setTile(gem.tx, gem.ty, 0);
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 12; i++) {
           particles.push({
-            x: px, y: py,
-            vx: (Math.random() - 0.5) * 2,
-            vy: -Math.random() * 2.4 - 0.5,
-            life: 24 + (Math.random() * 12 | 0),
-            color: i % 2 ? TIERS[gem.tier].hi : TIERS[gem.tier].color,
+            x: px, y: py - 4,
+            vx: (Math.random() - 0.5) * 2.6,
+            vy: -Math.random() * 3 - 0.6,
+            life: 26 + (Math.random() * 14 | 0),
+            color: i % 2 ? TIERS[gem.tier].hi : TIERS[gem.tier].mid,
             gold: false,
+            size: 3,
           });
         }
         setTimeout(() => {
@@ -567,17 +571,18 @@
       coins += total;
       miner.carry = [];
       const px = forgeX + T * 2, py = (floorRow - 2) * T;
-      for (let i = 0; i < 5 + total; i++) {
+      for (let i = 0; i < 6 + total; i++) {
         particles.push({
-          x: px + (Math.random() - 0.5) * 12, y: py,
-          vx: (Math.random() - 0.5) * 2.4,
-          vy: -2.6 - Math.random() * 2,
-          life: 30 + (Math.random() * 14 | 0),
+          x: px + (Math.random() - 0.5) * 16, y: py,
+          vx: (Math.random() - 0.5) * 2.8,
+          vy: -3 - Math.random() * 2.4,
+          life: 32 + (Math.random() * 16 | 0),
           color: "#f5c542",
           gold: true,
+          size: 4,
         });
       }
-      floats.push({ x: px, y: py - 6, text: "+" + total, life: 44 });
+      floats.push({ x: px, y: py - 8, text: "+" + total, life: 46 });
     }
 
     function px(x, y, w, h, color) {
@@ -585,98 +590,202 @@
       g.fillRect(Math.round(x), Math.round(y), w, h);
     }
 
+    const PAL = {
+      h: "#d9d2e2", H: "#b3aac4",
+      y: "#ffd54a", Y: "#fff3c4",
+      f: "#e8b98a", e: "#241a33",
+      j: "#5b3f9e", J: "#4a2f85",
+      B: "#2b1f4a", p: "#4a2f85",
+      k: "#241a33", w: "#8a5a2b", m: "#cfd2dd",
+    };
+
+    const BODY = [
+      ".....hhhhhh.....",
+      "....hhhhhhhh....",
+      "...hhhhyyyhhh...",
+      "..hhhhhhhyyhh...",
+      "hhhhhhhhhhhhhhh",
+      ".....fffff......",
+      "....fffffff.....",
+      "....fffefef.....",
+      "....fffffff.....",
+      ".....fffff......",
+      ".....jjjjjj.....",
+      "....jjjjjjjj....",
+      "....jJjjjjJj....",
+      "....jjjjjjjj....",
+      "....jBBBBBBj....",
+      "....jjjjjjjj....",
+      ".....pppppp.....",
+      ".....pp..pp.....",
+      ".....pp..pp.....",
+      ".....kk..kk.....",
+    ];
+    const BODY_WALK1 = [
+      ".....hhhhhh.....",
+      "....hhhhhhhh....",
+      "...hhhhyyyhhh...",
+      "..hhhhhhhyyhh...",
+      "hhhhhhhhhhhhhhh",
+      ".....fffff......",
+      "....fffffff.....",
+      "....fffefef.....",
+      "....fffffff.....",
+      ".....fffff......",
+      ".....jjjjjj.....",
+      "....jjjjjjjj....",
+      "....jJjjjjJj....",
+      "....jjjjjjjj....",
+      "....jBBBBBBj....",
+      "....jjjjjjjj....",
+      ".....pppppp.....",
+      "....pp..pp......",
+      "...pp....pp.....",
+      "...kk....kk.....",
+    ];
+    const BODY_WALK2 = [
+      ".....hhhhhh.....",
+      "....hhhhhhhh....",
+      "...hhhhyyyhhh...",
+      "..hhhhhhhyyhh...",
+      "hhhhhhhhhhhhhhh",
+      ".....fffff......",
+      "....fffffff.....",
+      "....fffefef.....",
+      "....fffffff.....",
+      ".....fffff......",
+      ".....jjjjjj.....",
+      "....jjjjjjjj....",
+      "....jJjjjjJj....",
+      "....jjjjjjjj....",
+      "....jBBBBBBj....",
+      "....jjjjjjjj....",
+      ".....pppppp.....",
+      ".....pp..pp.....",
+      "....pp....pp....",
+      "....kk....kk.....",
+    ];
+
+    function drawBody(rows, x, y) {
+      for (let r = 0; r < rows.length; r++) {
+        const row = rows[r];
+        for (let c = 0; c < row.length; c++) {
+          const ch = row[c];
+          if (ch === "." || ch === " ") continue;
+          if (PAL[ch]) px(x + c, y + r, 1, 1, PAL[ch]);
+        }
+      }
+    }
+
+    function drawPick(phase, x, y) {
+      const w = PAL.w, m = PAL.m;
+      if (phase === 0) {
+        px(x + 10, y + 2, 2, 10, w);
+        px(x + 6, y, 5, 2, m);
+        px(x + 10, y - 1, 2, 2, m);
+      } else if (phase === 1) {
+        px(x + 12, y - 8, 2, 12, w);
+        px(x + 9, y - 10, 5, 2, m);
+      } else {
+        px(x + 9, y + 7, 11, 2, w);
+        px(x + 18, y + 3, 2, 7, m);
+        px(x + 18, y + 2, 3, 2, "#ffffff");
+      }
+    }
+
     function drawMiner() {
       const m = miner;
-      const bob = m.grounded && m.vx !== 0 ? (m.walk > 6 ? 1 : 0) : 0;
+      const bob = m.grounded && m.vx !== 0 ? (m.walk > 7 ? 1 : 0) : 0;
       const cx = m.x, cy = m.y - bob;
+      let rows = BODY;
+      if (m.grounded && m.vx !== 0) rows = m.walk > 7 ? BODY_WALK2 : BODY_WALK1;
+
       g.save();
-      g.translate(Math.round(cx + 4), Math.round(cy));
+      g.translate(Math.round(cx), Math.round(cy));
       if (m.facing === -1) g.scale(-1, 1);
-      g.translate(-4, 0);
+      g.translate(-1, 0);
 
       const swing = m.mine > 0;
-      const phase = swing ? Math.floor((14 - m.mine) / 4) : 0;
-
-      if (swing) {
-        if (phase === 0) {
-          px(5, -1, 1, 4, "#b8873f");
-          px(2, -3, 4, 1, "#b9bec9");
-        } else if (phase === 1) {
-          px(6, -4, 1, 5, "#b8873f");
-          px(3, -5, 4, 1, "#b9bec9");
-        } else {
-          px(7, -1, 1, 4, "#b8873f");
-          px(4, 1, 4, 1, "#e8ecf5");
-          px(4, 1, 1, 1, "#ffffff");
-        }
-      } else {
-        px(0, 4, 1, 4, "#7a5a2f");
+      const phase = swing ? Math.floor((16 - m.mine) / 5) : -1;
+      if (swing) drawPick(phase, 0, 0);
+      else {
+        px(0, 9, 1, 6, PAL.w);
       }
-
-      px(1, 0, 6, 2, "#d9d2e2");
-      px(0, 2, 8, 1, "#b3aac4");
-      px(5, 1, 2, 2, "#ffd54a");
-      px(7, 1, 1, 1, "#fff3c4");
-      px(1, 3, 6, 2, "#e8b98a");
-      px(5, 3, 1, 1, "#241a33");
-      px(1, 5, 6, 4, "#5b3f9e");
-      px(2, 5, 1, 4, "#3b2a63");
-      px(1, 7, 6, 1, "#2b1f4a");
-      const leg = m.grounded && m.vx !== 0 ? (m.walk > 6 ? 0 : 1) : 0;
-      px(1, 9, 2, 2 + leg, "#4a2f85");
-      px(4, 9, 2, 3 - leg, "#4a2f85");
-      px(1, 11, 2, 1, "#241a33");
-      px(4, 11, 2, 1, "#241a33");
+      drawBody(rows, 0, 0);
       g.restore();
 
       for (let i = 0; i < m.carry.length; i++) {
         const tier = TIERS[m.carry[i]];
-        const gy = m.y - 9 - i * 5;
-        px(m.x + 1, gy, 3, 2, tier.color);
-        px(m.x + 2, gy - 1, 1, 1, tier.hi);
+        const gy = m.y - 12 - i * 7;
+        px(m.x + 4, gy, 6, 2, tier.color);
+        px(m.x + 2, gy + 2, 10, 3, tier.mid);
+        px(m.x + 5, gy + 5, 4, 2, tier.dark);
+        px(m.x + 6, gy + 1, 2, 1, tier.hi);
       }
+    }
+
+    function drawBoulder(tx, ty) {
+      const x = tx * T, y = ty * T;
+      px(x, y, T, T, ROCK);
+      px(x, y, T, 3, ROCK_HI);
+      px(x, y + T - 3, T, 3, ROCK_LO);
+      px(x, y, 1, T, ROCK_LINE);
+      px(x + T - 1, y, 1, T, ROCK_LINE);
+      px(x, y + T - 1, T, 1, ROCK_LINE);
+      px(x + 4, y + 5, 2, 2, ROCK_LO);
+      px(x + 10, y + 9, 2, 2, ROCK_LO);
+      px(x + 12, y + 3, 1, 1, ROCK_LO);
     }
 
     function drawGem(gm) {
       if (gm.state !== "wall") return;
       const tx = gm.tx * T, ty = gm.ty * T;
       const tier = TIERS[gm.tier];
-      const tw = frame % 24 < 3;
-      px(tx + 2, ty - 3, 4, 1, tier.color);
-      px(tx + 1, ty - 2, 6, 2, tier.color);
-      px(tx + 2, ty, 4, 1, tier.color);
-      px(tx + 3, ty - 2, 1, 1, tw ? tier.hi : "#f5f0ff");
+      const tw = frame % 28 < 4;
+      px(tx + 3, ty - 5, 10, 2, tier.color);
+      px(tx + 1, ty - 3, 14, 3, tier.color);
+      px(tx + 3, ty, 10, 2, tier.mid);
+      px(tx + 2, ty - 2, 3, 2, tier.hi);
+      px(tx + 9, ty - 1, 2, 1, tier.dark);
+      px(tx + 6, ty - 4, 2, 2, tw ? "#ffffff" : tier.hi);
       if (gm.crack === 1) {
-        px(tx + 1, ty - 2, 1, 1, "#8d8578");
-        px(tx + 3, ty, 1, 1, "#8d8578");
-        px(tx + 5, ty - 3, 1, 1, "#8d8578");
+        px(tx + 2, ty + 4, 1, 2, "#7d756a");
+        px(tx + 6, ty + 6, 2, 1, "#7d756a");
+        px(tx + 11, ty + 4, 1, 2, "#7d756a");
       }
     }
 
     function drawForge() {
       const fx = forgeX, fy = (floorRow - 2) * T;
       for (let i = 0; i < 3; i++) {
-        px(fx + i * T, fy, T, T, ROCK);
-        px(fx + i * T, fy, T, 1, ROCK_HI);
-        px(fx + i * T, fy + T - 1, T, 1, ROCK_LO);
-        px(fx + i * T, fy, 1, T, ROCK_LINE);
+        const x = fx + i * T;
+        px(x, fy, T, T, ROCK);
+        px(x, fy, T, 3, ROCK_HI);
+        px(x, fy + T - 3, T, 3, ROCK_LO);
+        px(x, fy, 1, T, ROCK_LINE);
+        px(x + T - 1, fy, 1, T, ROCK_LINE);
+        px(x, fy + T - 1, T, 1, ROCK_LINE);
+        px(x + 3, fy + 5, 2, 2, ROCK_LO);
+        px(x + 10, fy + 9, 2, 2, ROCK_LO);
       }
-      const fire = frame % 16 < 8;
-      px(fx + T, fy - 4, 8, 4, "#6d28d9");
-      px(fx + T + 2, fy - (fire ? 7 : 5), 4, fire ? 4 : 2, "#a78bfa");
-      px(fx + T + 3, fy - 8, 2, 2, "#ede9fe");
+      const fire = Math.floor(frame / 6) % 3;
+      px(fx + T, fy - 6, 12, 6, "#6d28d9");
+      px(fx + T + 3, fy - 6 - fire * 2, 6, 3 + fire * 2, "#a78bfa");
+      px(fx + T + 5, fy - 8 - fire * 2, 3, 3, "#ede9fe");
       const chestX = fx + T * 4;
-      px(chestX, fy + 2, T, T - 2, "#8a5a2b");
-      px(chestX, fy + 2, T, 2, "#a5713f");
-      px(chestX + 3, fy + 5, 2, 2, "#f5c542");
+      px(chestX, fy + 5, T, T - 5, "#8a5a2b");
+      px(chestX, fy + 5, T, 3, "#a5713f");
+      px(chestX + 6, fy + 9, 4, 3, "#f5c542");
+      px(chestX + 2, fy + 5, 2, 1, "#6d4520");
+      px(chestX + 12, fy + 5, 2, 1, "#6d4520");
     }
 
     function drawMarker(x, y) {
-      const bob = frame % 40 < 20 ? 0 : 2;
+      const bob = frame % 40 < 20 ? 0 : 3;
       g.fillStyle = "rgba(60, 50, 40, 0.55)";
-      g.font = "6px ui-monospace, Menlo, monospace";
+      g.font = "8px ui-monospace, Menlo, monospace";
       g.textAlign = "center";
-      g.fillText("▼", x, y - 10 + bob);
+      g.fillText("▼", x, y - 18 + bob);
       g.textAlign = "left";
     }
 
@@ -688,15 +797,24 @@
         g.fillStyle = "rgba(90, 78, 62, 0.10)";
         g.fillRect(Math.round(d.x), Math.round(d.y), d.s, d.s);
       }
+      for (const s of smoke) {
+        g.fillStyle = "rgba(120, 110, 100, " + Math.max(0, 0.22 - s.age * 0.012) + ")";
+        g.fillRect(Math.round(s.x), Math.round(s.y), 3, 3);
+      }
 
       for (let ty = 0; ty < H; ty++) {
         for (let tx = 0; tx < W; tx++) {
           if (!tile(tx, ty)) continue;
-          const x = tx * T, y = ty * T;
-          px(x, y, T, T, ROCK);
-          px(x, y, T, 1, ROCK_HI);
-          px(x, y + T - 1, T, 1, ROCK_LO);
-          px(x, y, 1, T, ROCK_LINE);
+          if (ty >= floorRow - 1 && !(ty === floorRow - 1 && gems.some((gm) => gm.state !== "done" && gm.tx === tx && gm.ty === ty))) {
+            const x = tx * T, y = ty * T;
+            px(x, y, T, T, ROCK);
+            px(x, y, T, 2, ROCK_HI);
+            px(x, y + T - 2, T, 2, ROCK_LO);
+            px(x, y + T - 1, T, 1, ROCK_LINE);
+            if ((tx * 7 + ty * 13) % 5 === 0) px(x + 6, y + 7, 2, 2, ROCK_LO);
+          } else if (ty === floorRow - 1) {
+            drawBoulder(tx, ty);
+          }
         }
       }
 
@@ -704,12 +822,12 @@
       for (const gm of gems) drawGem(gm);
 
       for (const p of particles) {
-        g.globalAlpha = Math.max(0, p.life / 30);
+        g.globalAlpha = Math.max(0, p.life / 34);
         if (p.gold) {
-          px(p.x - 1, p.y - 1, 3, 3, p.color);
-          px(p.x - 1, p.y - 1, 3, 1, "#fff3c4");
+          px(p.x - 2, p.y - 2, 4, 4, p.color);
+          px(p.x - 2, p.y - 2, 4, 1, "#fff3c4");
         } else {
-          px(p.x, p.y, 2, 2, p.color);
+          px(p.x, p.y, p.size, p.size, p.color);
         }
         g.globalAlpha = 1;
       }
@@ -721,26 +839,27 @@
         if (miner.carry.length) drawMarker(forgeX + T * 2, (floorRow - 2) * T);
       } else {
         let best = null, bd = 1e9;
-        const mx = miner.x + 4, my = miner.y + 6;
+        const mx = miner.x + 7, my = miner.y + 9;
         for (const gm of live) {
-          const d = Math.abs(gm.tx * T + 4 - mx) + Math.abs(gm.ty * T + 4 - my);
+          const d = Math.abs(gm.tx * T + 8 - mx) + Math.abs(gm.ty * T + 8 - my);
           if (d < bd) { bd = d; best = gm; }
         }
-        if (best) drawMarker(best.tx * T + 4, best.ty * T);
+        if (best) drawMarker(best.tx * T + 8, best.ty * T);
       }
 
-      g.font = "7px ui-monospace, Menlo, monospace";
+      g.font = "9px ui-monospace, Menlo, monospace";
       g.textBaseline = "top";
       g.fillStyle = "rgba(60, 50, 40, 0.7)";
-      g.fillText("gems " + gemsMined + " · coins " + coins, 10, 10);
+      g.fillText("gems " + gemsMined + " · coins " + coins, 12, 12);
       if (miner.carry.length) {
         g.fillStyle = "rgba(91, 63, 158, 0.8)";
-        g.fillText("haul " + miner.carry.length + "/3", 10, 20);
+        g.fillText("haul " + miner.carry.length + "/3", 12, 24);
       }
 
       for (const f of floats) {
-        g.globalAlpha = Math.max(0, f.life / 44);
+        g.globalAlpha = Math.max(0, f.life / 46);
         g.fillStyle = "#e6a817";
+        g.font = "9px ui-monospace, Menlo, monospace";
         g.fillText(f.text, f.x, f.y);
         g.globalAlpha = 1;
       }
@@ -761,7 +880,15 @@
         d.x += d.vx;
         d.y += d.vy;
         if (d.x < -4) d.x = window.innerWidth + 4;
-        if (d.y > floorRow * T - 8) d.y = 4;
+        if (d.y > floorRow * T - 12) d.y = 4;
+      }
+      for (const s of smoke) {
+        s.y -= 0.35;
+        s.age += 1;
+      }
+      smoke = smoke.filter((s) => s.age < 26);
+      if (frame % 14 === 0) {
+        smoke.push({ x: forgeX + T + 5, y: (floorRow - 2) * T - 10, age: 0 });
       }
       requestAnimationFrame(loop);
     }

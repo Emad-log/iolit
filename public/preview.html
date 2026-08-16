@@ -29,14 +29,6 @@
       font-family: Inter, system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
-    canvas#field {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
-    }
     .banner {
       position: fixed;
       top: 14px;
@@ -61,8 +53,51 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-end;
-      padding: 0 24px 36px;
+      justify-content: center;
+      padding: 56px 24px 36px;
+    }
+    .gamecard {
+      width: min(520px, 92vw);
+      margin-bottom: 30px;
+    }
+    canvas#game {
+      display: block;
+      width: 100%;
+      aspect-ratio: 2 / 1;
+      image-rendering: pixelated;
+      border-radius: 14px;
+      border: 1px solid hsl(38 22% 84%);
+      box-shadow: 0 18px 40px -18px rgba(46, 16, 91, 0.25);
+    }
+    .pad {
+      display: none;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 10px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    @media (hover: none) {
+      .pad { display: flex; }
+    }
+    .pad button {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 13px;
+      width: 52px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid hsl(38 22% 80%);
+      background: hsl(38 45% 97%);
+      color: hsl(30 22% 20%);
+      cursor: pointer;
+    }
+    .pad button:active { background: hsl(262 70% 45%); color: #faf7f0; }
+    .hint {
+      margin-top: 10px;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: hsl(30 10% 46%);
     }
     .copy {
       width: 100%;
@@ -70,7 +105,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding-bottom: 8px;
     }
     h1 {
       font-family: Fraunces, Georgia, serif;
@@ -107,7 +141,7 @@
       padding: 0 18px;
       border-radius: 999px;
       border: 1px solid hsl(38 22% 78%);
-      background: hsl(38 45% 97% / 0.9);
+      background: hsl(38 45% 97%);
       font-size: 14px;
       color: hsl(30 22% 12%);
       outline: none;
@@ -163,7 +197,7 @@
       color: hsl(30 10% 40%);
     }
     footer {
-      margin-top: 36px;
+      margin-top: 32px;
       display: flex;
       gap: 18px;
       font-family: ui-monospace, Menlo, monospace;
@@ -174,9 +208,19 @@
   </style>
 </head>
 <body>
-  <canvas id="field" aria-hidden="true"></canvas>
   <div class="banner">preview · <a href="/">live site</a></div>
   <main>
+    <div class="gamecard">
+      <canvas id="game" aria-label="Playable pixel miner game"></canvas>
+      <div class="pad">
+        <button id="b-l" aria-label="left">◀</button>
+        <button id="b-j" aria-label="jump">▲</button>
+        <button id="b-m" aria-label="mine">⛏</button>
+        <button id="b-r" aria-label="right">▶</button>
+      </div>
+      <p class="hint" id="hint">move ← → · jump ↑ · mine space</p>
+    </div>
+
     <div class="copy">
       <h1>Your AI subscription<br>should <span class="accent">pay you back.</span></h1>
       <p class="sub">A silent agent for Claude, Cursor, and Codex. More you share, more you get paid.</p>
@@ -226,209 +270,388 @@
       }
     });
 
-    // The page is bits. Depth is only color + which digit.
-    const REST = {
-      n: [0, 1.12, 0],
-      e: [0.96, 0.18, 0],
-      s: [0, -1.28, 0],
-      w: [-0.96, 0.18, 0],
-      f: [0, 0.08, 0.62],
-      b: [0, 0.08, -0.56],
-      tn: [0, 0.72, 0.12],
-      te: [0.28, 0.42, 0.18],
-      tw: [-0.28, 0.42, 0.18],
-      tb: [0, 0.42, -0.16],
-      cu: [0, -0.08, 0],
+    const TW = 160, TH = 80, T = 8;
+    const cv = document.getElementById("game");
+    cv.width = TW;
+    cv.height = TH;
+    const g = cv.getContext("2d");
+    g.imageSmoothingEnabled = false;
+
+    const ROCK = "#3a2c4d", ROCK_HI = "#55406b", ROCK_LO = "#241a33";
+    const TIERS = {
+      pulse: { color: "#c4b5fd", hi: "#ede9fe", coins: 1 },
+      trace: { color: "#8b5cf6", hi: "#ddd6fe", coins: 4 },
+      raw: { color: "#4c1d95", hi: "#a78bfa", coins: 12 },
     };
-    const FACETS = [
-      ["tn", "te", "f"],
-      ["tn", "f", "tw"],
-      ["te", "e", "f"],
-      ["tw", "f", "w"],
-      ["tn", "n", "te"],
-      ["tn", "tw", "n"],
-      ["n", "e", "te"],
-      ["n", "tw", "w"],
-      ["e", "s", "f"],
-      ["w", "f", "s"],
-      ["tn", "tb", "n"],
-      ["n", "tb", "e"],
-      ["n", "w", "tb"],
-      ["e", "tb", "s"],
-      ["w", "s", "tb"],
-      ["e", "b", "s"],
-      ["w", "s", "b"],
-      ["n", "b", "e"],
-      ["n", "w", "b"],
-    ];
 
-    function v3(a, b, c) { return [a, b, c]; }
-    function add(a, b) { return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]; }
-    function sub(a, b) { return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]; }
-    function mul(a, s) { return [a[0] * s, a[1] * s, a[2] * s]; }
-    function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
-    function cross(a, b) {
-      return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+    const W = TW / T, H = TH / T;
+    const solid = new Uint8Array(W * H);
+    const gems = [];
+    let coins = 0, gemsMined = 0;
+    let particles = [];
+    let floats = [];
+    let frame = 0;
+
+    function tile(tx, ty) {
+      if (tx < 0 || tx >= W || ty < 0 || ty >= H) return 1;
+      return solid[ty * W + tx];
     }
-    function len(a) { return Math.hypot(a[0], a[1], a[2]); }
-    function norm(a) {
-      const l = len(a) || 1;
-      return [a[0] / l, a[1] / l, a[2] / l];
-    }
-    function rotX(p, a) {
-      const c = Math.cos(a), s = Math.sin(a);
-      return [p[0], p[1] * c - p[2] * s, p[1] * s + p[2] * c];
-    }
-    function rotY(p, a) {
-      const c = Math.cos(a), s = Math.sin(a);
-      return [p[0] * c + p[2] * s, p[1], -p[0] * s + p[2] * c];
-    }
-    function hash(i, j, s) {
-      let n = (i * 374761393 + j * 668265263 + s * 1440662637) >>> 0;
-      n = Math.imul(n ^ (n >>> 13), 1274126177);
-      return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
+    function setTile(tx, ty, v) { solid[ty * W + tx] = v; }
+
+    function buildCave() {
+      solid.fill(0);
+      for (let y = 7; y < H; y++) for (let x = 0; x < W; x++) setTile(x, y, 1);
+      for (const [x0, x1, y] of [[6, 8, 5], [13, 14, 4]]) {
+        for (let x = x0; x <= x1; x++) setTile(x, y, 1);
+      }
+      spawnGemAt(2, 6, "pulse");
+      spawnGemAt(3, 6, "trace");
+      spawnGemAt(11, 6, "raw");
+      spawnGemAt(18, 6, "pulse");
+      spawnGemAt(7, 4, "trace");
+      spawnGemAt(13, 3, "raw");
     }
 
-    function bary(p, a, b, c) {
-      const v0x = b[0] - a[0], v0y = b[1] - a[1];
-      const v1x = c[0] - a[0], v1y = c[1] - a[1];
-      const v2x = p[0] - a[0], v2y = p[1] - a[1];
-      const den = v0x * v1y - v1x * v0y;
-      if (Math.abs(den) < 1e-6) return null;
-      const v = (v2x * v1y - v1x * v2y) / den;
-      const w = (v0x * v2y - v2x * v0y) / den;
-      const u = 1 - v - w;
-      if (u < -0.004 || v < -0.004 || w < -0.004) return null;
-      return true;
+    function spawnGemAt(tx, ty, tier) {
+      gems.push({ tx, ty, tier, t: 0, mined: false });
+    }
+    function respawnGem() {
+      const open = [];
+      for (let ty = 0; ty < 7; ty++) {
+        for (let tx = 0; tx < W; tx++) {
+          if (!tile(tx, ty)) continue;
+          if (!gems.some((gm) => gm.tx === tx && gm.ty === ty)) open.push([tx, ty]);
+        }
+      }
+      if (!open.length) return;
+      const r = Math.random();
+      const tier = r < 0.6 ? "pulse" : r < 0.9 ? "trace" : "raw";
+      const [tx, ty] = open[(Math.random() * open.length) | 0];
+      spawnGemAt(tx, ty, tier);
     }
 
-    const canvas = document.getElementById("field");
-    const ctx = canvas.getContext("2d", { alpha: false });
+    const miner = {
+      x: 8, y: 40, vx: 0, vy: 0,
+      w: 8, h: 12,
+      facing: 1, grounded: false,
+      mine: 0, walk: 0,
+    };
+    const keys = {};
+    let mineQueued = false;
+    let lastInput = -1e9;
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let cell = 6;
-    let cols = 0;
-    let rows = 0;
-    let bits = [];
+    const now = () => performance.now();
 
-    function layout() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      cell = w < 640 ? 5.5 : 6.2;
-      cols = Math.ceil(w / cell) + 1;
-      rows = Math.ceil(h / cell) + 1;
-      bits = new Array(cols * rows);
-      for (let j = 0; j < rows; j++) {
-        for (let i = 0; i < cols; i++) bits[j * cols + i] = hash(i, j, 7) > 0.5 ? "1" : "0";
+    function touchUser() { lastInput = now(); }
+
+    window.addEventListener("keydown", (e) => {
+      if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(e.key)) e.preventDefault();
+      keys[e.key] = true;
+      if (e.code === "Space") mineQueued = true;
+      touchUser();
+    });
+    window.addEventListener("keyup", (e) => { keys[e.key] = false; });
+
+    function hold(id, down) {
+      const el = document.getElementById(id);
+      el.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        touchUser();
+        if (id === "b-l") keys["ArrowLeft"] = true;
+        if (id === "b-r") keys["ArrowRight"] = true;
+        if (id === "b-j") keys["ArrowUp"] = true;
+        if (id === "b-m") mineQueued = true;
+      });
+      el.addEventListener("pointerup", () => {
+        if (id === "b-l") keys["ArrowLeft"] = false;
+        if (id === "b-r") keys["ArrowRight"] = false;
+        if (id === "b-j") keys["ArrowUp"] = false;
+      });
+      el.addEventListener("pointerleave", () => {
+        if (id === "b-l") keys["ArrowLeft"] = false;
+        if (id === "b-r") keys["ArrowRight"] = false;
+        if (id === "b-j") keys["ArrowUp"] = false;
+      });
+    }
+    hold("b-l"); hold("b-r"); hold("b-j"); hold("b-m");
+
+    cv.addEventListener("pointerdown", (e) => {
+      const rect = cv.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * TW;
+      const y = ((e.clientY - rect.top) / rect.height) * TH;
+      const tx = (x / T) | 0, ty = (y / T) | 0;
+      touchUser();
+      const gem = gems.find((gm) => !gm.mined && gm.tx === tx && gm.ty === ty);
+      const mx = miner.x + 4, my = miner.y + 6;
+      if (gem && Math.abs(tx * T - mx) <= T * 2.2 && Math.abs(ty * T - my) <= T * 2.2) {
+        miner.facing = tx * T >= mx ? 1 : -1;
+        mineQueued = true;
+      } else if (x > TW * 0.5) {
+        keys["ArrowRight"] = true;
+        setTimeout(() => { keys["ArrowRight"] = false; }, 220);
+      } else if (y < TH * 0.4) {
+        keys["ArrowUp"] = true;
+        setTimeout(() => { keys["ArrowUp"] = false; }, 160);
+      } else {
+        keys["ArrowLeft"] = true;
+        setTimeout(() => { keys["ArrowLeft"] = false; }, 220);
       }
-    }
+    });
 
-    function project(p, w, h, scale) {
-      const z = p[2] + 3.05;
-      const f = scale / z;
-      return [w * 0.5 + p[0] * f, h * 0.36 - p[1] * f, p[2], z];
-    }
-
-    function mesh(t) {
-      const yaw = reduce ? -0.48 : -0.38 + Math.sin(t / 6200) * 0.55;
-      const pitch = 0.32 + (reduce ? 0 : Math.sin(t / 9100) * 0.06);
-      const pts = {};
-      for (const k of Object.keys(REST)) pts[k] = rotY(rotX(REST[k], pitch), yaw);
-      const light = norm([
-        -0.62 + (reduce ? 0 : Math.sin(t / 4300) * 0.2),
-        0.74,
-        0.28 + (reduce ? 0 : Math.cos(t / 4300) * 0.22),
-      ]);
-      const faces = [];
-      for (const keys of FACETS) {
-        const a = pts[keys[0]], b = pts[keys[1]], c = pts[keys[2]];
-        const n = norm(cross(sub(b, a), sub(c, a)));
-        if (n[2] <= 0.02) continue;
-        const lambert = Math.max(0, dot(n, light));
-        const spec = Math.pow(Math.max(0, 0.45 * lambert + 0.55 * n[2]), 16);
-        faces.push({
-          a, b, c, n,
-          lit: 0.12 + lambert * 0.82 + spec * 0.7,
-          spec,
-          hue: 262 + (1 - lambert) * 8 - spec * 10,
-          z: (a[2] + b[2] + c[2]) / 3,
-        });
+    function autopilot() {
+      if (reduce) return;
+      if (now() - lastInput < 4200) return;
+      const live = gems.filter((gm) => !gm.mined);
+      if (!live.length) return;
+      let best = null, bd = 1e9;
+      const mx = miner.x + 4, my = miner.y + 6;
+      for (const gm of live) {
+        const dx = gm.tx * T + 4 - mx;
+        const dy = gm.ty * T + 4 - my;
+        const d = Math.abs(dx) + Math.abs(dy);
+        if (d < bd) { bd = d; best = gm; }
       }
-      faces.sort((x, y) => x.z - y.z);
-      return faces;
+      if (!best) return;
+      const frontTx = miner.facing === 1
+        ? ((miner.x + miner.w) / T | 0)
+        : ((miner.x - 1) / T | 0);
+      const bodyTy = ((miner.y + 4) / T) | 0;
+      const aligned = best.tx === frontTx && best.ty === bodyTy;
+      if (aligned && miner.grounded) {
+        mineQueued = true;
+        return;
+      }
+      const tx = best.tx * T + 4;
+      miner.facing = tx >= mx ? 1 : -1;
+      keys["ArrowLeft"] = tx < mx - 3;
+      keys["ArrowRight"] = tx > mx + 3;
+      const aheadTx = miner.facing === 1 ? ((miner.x + miner.w) / T | 0) : ((miner.x - 1) / T | 0);
+      const chestSolid = tile(aheadTx, ((miner.y + 4) / T) | 0) || tile(aheadTx, ((miner.y - 2) / T) | 0);
+      keys["ArrowUp"] = chestSolid && miner.grounded && best.ty * T + 4 < my - 6;
     }
 
-    function draw(t) {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      ctx.fillStyle = "hsl(38, 40%, 95%)";
-      ctx.fillRect(0, 0, w, h);
+    function update() {
+      if (miner.mine > 0) {
+        miner.mine -= 1;
+        if (miner.mine === 6) breakGem();
+        miner.vx = 0;
+      } else {
+        miner.vx = 0;
+        if (keys["ArrowLeft"]) { miner.vx = -1.35; miner.facing = -1; }
+        if (keys["ArrowRight"]) { miner.vx = 1.35; miner.facing = 1; }
+        if (miner.vx !== 0 && miner.grounded) miner.walk = (miner.walk + 1) % 14;
 
-      const scale = Math.min(w, h) * 1.05;
-      const faces = mesh(t).map((f) => ({
-        ...f,
-        pa: project(f.a, w, h, scale),
-        pb: project(f.b, w, h, scale),
-        pc: project(f.c, w, h, scale),
-      }));
-
-      ctx.font = "600 " + Math.max(6, Math.round(cell * 0.92)) + "px ui-monospace, Menlo, monospace";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      const copyTop = h * 0.58;
-      const tick = reduce ? 0 : ((t / 480) | 0);
-
-      for (let j = 0; j < rows; j++) {
-        for (let i = 0; i < cols; i++) {
-          const px = (i + 0.5) * cell;
-          const py = (j + 0.5) * cell;
-          let hit = null;
-          for (let k = faces.length - 1; k >= 0; k--) {
-            if (bary([px, py], faces[k].pa, faces[k].pb, faces[k].pc)) {
-              hit = faces[k];
-              break;
-            }
+        const frontTx = miner.facing === 1
+          ? ((miner.x + miner.w) / T | 0)
+          : ((miner.x - 1) / T | 0);
+        const bodyTy = ((miner.y + 4) / T) | 0;
+        if (mineQueued && miner.grounded) {
+          mineQueued = false;
+          const gem = gems.find((gm) => !gm.mined && gm.tx === frontTx && gm.ty === bodyTy);
+          if (gem) {
+            miner.mine = 12;
+            miner.vx = 0;
           }
+        }
+      }
+      mineQueued = false;
 
-          let bit = bits[j * cols + i];
-          if (!reduce && hash(i, j, tick) > 0.992) bit = bit === "1" ? "0" : "1";
+      miner.vy = Math.min(5, miner.vy + 0.3);
+      if (keys["ArrowUp"] && miner.grounded) { miner.vy = -4.4; miner.grounded = false; }
 
-          if (hit) {
-            const lit = Math.min(1.2, hit.lit);
-            const ones = 0.76 - Math.min(1, lit) * 0.48;
-            bit = hash(i, j, 3) > ones ? "1" : "0";
-            if (hit.spec > 0.5) bit = "1";
-            const sat = 64 + lit * 16;
-            const lite = 16 + lit * 54;
-            const quiet = py > copyTop ? 0.8 : 1;
-            const alpha = (0.42 + Math.min(1, lit) * 0.52) * quiet;
-            ctx.fillStyle = "hsla(" + hit.hue.toFixed(0) + ", " + sat.toFixed(0) + "%, " + lite.toFixed(0) + "%, " + alpha.toFixed(3) + ")";
-          } else {
-            const fade = py > copyTop ? 0.055 : 0.1;
-            ctx.fillStyle = "hsla(30, 10%, 26%, " + fade + ")";
-          }
-          ctx.fillText(bit, px, py);
+      miner.x += miner.vx;
+      if (miner.vx < 0) {
+        const t = (miner.x / T) | 0;
+        if (tile(t, (miner.y / T) | 0) || tile(t, ((miner.y + miner.h - 1) / T) | 0)) miner.x = (t + 1) * T;
+      } else if (miner.vx > 0) {
+        const t = ((miner.x + miner.w) / T) | 0;
+        if (tile(t, (miner.y / T) | 0) || tile(t, ((miner.y + miner.h - 1) / T) | 0)) miner.x = t * T - miner.w;
+      }
+      miner.x = Math.max(0, Math.min(TW - miner.w, miner.x));
+
+      miner.y += miner.vy;
+      if (miner.vy < 0) {
+        const t = (miner.y / T) | 0;
+        if (tile((miner.x / T) | 0, t) || tile(((miner.x + miner.w - 1) / T) | 0, t)) {
+          miner.y = (t + 1) * T;
+          miner.vy = 0;
+        }
+      } else {
+        const t = ((miner.y + miner.h) / T) | 0;
+        if (tile((miner.x / T) | 0, t) || tile(((miner.x + miner.w - 1) / T) | 0, t)) {
+          miner.y = t * T - miner.h;
+          miner.vy = 0;
+          miner.grounded = true;
+        } else {
+          miner.grounded = false;
         }
       }
     }
 
-    layout();
-    if (reduce) draw(0);
-    else {
-      const tick = (now) => {
-        draw(now);
-        requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
+    function breakGem() {
+      const frontTx = miner.facing === 1
+        ? ((miner.x + miner.w) / T | 0)
+        : ((miner.x - 1) / T | 0);
+      const bodyTy = ((miner.y + 4) / T) | 0;
+      const gem = gems.find((gm) => !gm.mined && gm.tx === frontTx && gm.ty === bodyTy);
+      if (!gem) return;
+      gem.mined = true;
+      gemsMined += 1;
+      coins += TIERS[gem.tier].coins;
+      const px = gem.tx * T + 4, py = gem.ty * T + 4;
+      for (let i = 0; i < 10; i++) {
+        particles.push({
+          x: px, y: py,
+          vx: (Math.random() - 0.5) * 2.4,
+          vy: -Math.random() * 2.6 - 0.6,
+          life: 26 + (Math.random() * 14 | 0),
+          color: i % 2 ? TIERS[gem.tier].hi : TIERS[gem.tier].color,
+          gold: false,
+        });
+      }
+      for (let i = 0; i < 3; i++) {
+        particles.push({
+          x: px, y: py - 2,
+          vx: (Math.random() - 0.5) * 1.4,
+          vy: -2.8 - Math.random(),
+          life: 30,
+          color: "#f5c542",
+          gold: true,
+        });
+      }
+      floats.push({ x: px, y: py - 4, text: "+" + TIERS[gem.tier].coins, life: 40 });
+      setTile(gem.tx, gem.ty, 0);
+      setTimeout(respawnGem, 5000);
     }
-    window.addEventListener("resize", () => {
-      layout();
-      if (reduce) draw(0);
-    });
+
+    function px(x, y, w, h, color) {
+      g.fillStyle = color;
+      g.fillRect(Math.round(x), Math.round(y), w, h);
+    }
+
+    function drawMiner() {
+      const m = miner;
+      const bob = m.grounded && m.vx !== 0 ? (m.walk > 6 ? 1 : 0) : 0;
+      const cx = m.x, cy = m.y - bob;
+      g.save();
+      g.translate(Math.round(cx + 4), Math.round(cy));
+      if (m.facing === -1) g.scale(-1, 1);
+      g.translate(-4, 0);
+
+      const swing = m.mine > 0;
+      const phase = swing ? Math.floor((12 - m.mine) / 4) : 0;
+
+      if (swing) {
+        px(5, 0, 1, 4, "#8a5a2b");
+        if (phase < 2) px(1, 0, 4, 1, "#c9c9d6");
+        else px(1, 4, 4, 1, "#c9c9d6");
+        px(1, 0, 1, 1, "#8a5a2b");
+      } else {
+        px(0, 4, 1, 4, "#4c1d95");
+      }
+
+      px(1, 0, 6, 2, "#e8dcc8");
+      px(0, 2, 8, 1, "#d8c8a8");
+      px(5, 1, 2, 2, "#ffd54a");
+      px(7, 1, 1, 1, "#fff3c4");
+      px(1, 3, 6, 2, "#e8b98a");
+      px(5, 3, 1, 1, "#241a33");
+      px(1, 5, 6, 4, "#6d28d9");
+      px(2, 5, 1, 4, "#4c1d95");
+      px(1, 7, 6, 1, "#3b1d33");
+      const leg = m.grounded && m.vx !== 0 ? (m.walk > 6 ? 0 : 1) : 0;
+      px(1, 9, 2, 2 + leg, "#7c3aed");
+      px(4, 9, 2, 3 - leg, "#7c3aed");
+      px(1, 11, 2, 1, "#241a33");
+      px(4, 11, 2, 1, "#241a33");
+      g.restore();
+
+      const lamX = m.x + (m.facing === 1 ? 9 : -2);
+      const lamp = g.createRadialGradient(lamX, m.y + 2, 1, lamX, m.y + 2, 22);
+      lamp.addColorStop(0, "rgba(255, 214, 90, 0.20)");
+      lamp.addColorStop(1, "rgba(255, 214, 90, 0)");
+      g.fillStyle = lamp;
+      g.fillRect(lamX - 22, m.y - 20, 44, 44);
+    }
+
+    function drawGem(gm) {
+      const tx = gm.tx * T, ty = gm.ty * T;
+      const tier = TIERS[gm.tier];
+      const tw = frame % 24 < 3;
+      px(tx + 2, ty + 1, 4, 1, tier.color);
+      px(tx + 1, ty + 2, 6, 2, tier.color);
+      px(tx + 2, ty + 4, 4, 1, tier.color);
+      px(tx + 3, ty + 2, 1, 1, tw ? tier.hi : "#f5f0ff");
+    }
+
+    function draw() {
+      const bg = g.createLinearGradient(0, 0, 0, TH);
+      bg.addColorStop(0, "#241a3d");
+      bg.addColorStop(1, "#160e26");
+      g.fillStyle = bg;
+      g.fillRect(0, 0, TW, TH);
+      g.fillStyle = "rgba(255,255,255,0.03)";
+      for (let i = 0; i < 46; i++) {
+        const sx = (i * 61) % TW, sy = (i * 37) % TH;
+        g.fillRect(sx, sy, 1, 1);
+      }
+
+      for (let ty = 0; ty < H; ty++) {
+        for (let tx = 0; tx < W; tx++) {
+          if (!tile(tx, ty)) continue;
+          const x = tx * T, y = ty * T;
+          px(x, y, T, T, ROCK);
+          px(x, y, T, 1, ROCK_HI);
+          px(x, y + T - 1, T, 1, ROCK_LO);
+          px(x, y, 1, T, "rgba(255,255,255,0.05)");
+        }
+      }
+
+      for (const gm of gems) if (!gm.mined) drawGem(gm);
+
+      for (const p of particles) {
+        g.globalAlpha = Math.max(0, p.life / 30);
+        if (p.gold) {
+          px(p.x - 1, p.y - 1, 3, 3, p.color);
+          px(p.x - 1, p.y - 1, 3, 1, "#fff3c4");
+        } else {
+          px(p.x, p.y, 2, 2, p.color);
+        }
+        g.globalAlpha = 1;
+      }
+
+      drawMiner();
+
+      g.font = "6px ui-monospace, Menlo, monospace";
+      g.textBaseline = "top";
+      g.fillStyle = "rgba(255,255,255,0.75)";
+      g.fillText("gems " + gemsMined + " · coins " + coins, 4, 4);
+
+      for (const f of floats) {
+        g.globalAlpha = Math.max(0, f.life / 40);
+        g.fillStyle = "#f5c542";
+        g.fillText(f.text, f.x, f.y);
+        g.globalAlpha = 1;
+      }
+    }
+
+    function loop() {
+      autopilot();
+      update();
+      draw();
+      frame += 1;
+      for (const p of particles) {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= 1;
+      }
+      particles = particles.filter((p) => p.life > 0);
+      for (const f of floats) { f.y -= 0.4; f.life -= 1; }
+      floats = floats.filter((f) => f.life > 0);
+      requestAnimationFrame(loop);
+    }
+
+    buildCave();
+    requestAnimationFrame(loop);
   </script>
 </body>
 </html>

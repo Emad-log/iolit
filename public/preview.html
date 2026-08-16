@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iolit preview</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    @font-face {
+      font-family: Inter;
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url("/fonts/inter-latin.woff2") format("woff2");
+    }
+    @font-face {
+      font-family: Fraunces;
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url("/fonts/fraunces-latin.woff2") format("woff2");
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      background: hsl(38 40% 95%);
+      color: hsl(30 22% 12%);
+      font-family: Inter, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    main {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 72px 24px 48px;
+    }
+    .mark {
+      width: 88px;
+      height: 88px;
+      border: 0;
+      background: none;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 36px;
+      filter: drop-shadow(0 3px 4px rgba(40, 20, 10, 0.16));
+      transition: transform 0.35s cubic-bezier(0.22, 0.9, 0.3, 1), filter 0.35s ease;
+    }
+    .mark:hover { transform: rotate(-4deg) scale(1.04); }
+    .mark:active { transform: rotate(6deg) scale(0.97); }
+    .mark svg { width: 100%; height: 100%; display: block; }
+    .tier {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: hsl(262 70% 45%);
+      margin-bottom: 14px;
+      min-height: 16px;
+    }
+    h1 {
+      font-family: Fraunces, Georgia, serif;
+      font-weight: 500;
+      font-size: clamp(36px, 6vw, 56px);
+      line-height: 1.04;
+      letter-spacing: -0.025em;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .accent {
+      background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 60%, #5b21b6 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-style: italic;
+      padding-right: 0.3em;
+    }
+    .sub {
+      font-size: 16px;
+      line-height: 1.55;
+      color: hsl(30 10% 42%);
+      text-align: center;
+      max-width: 380px;
+      min-height: 50px;
+      margin-bottom: 28px;
+    }
+    form {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 380px;
+    }
+    input[type="email"] {
+      flex: 1;
+      height: 46px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid hsl(38 22% 86%);
+      background: hsl(38 45% 97%);
+      font-size: 14px;
+      color: hsl(30 22% 12%);
+      outline: none;
+    }
+    input[type="email"]:focus {
+      border-color: hsl(262 70% 45%);
+      box-shadow: 0 0 0 3px hsl(262 70% 45% / 0.15);
+    }
+    .btn {
+      height: 46px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 999px;
+      color: #faf7f0;
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .ok {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .ok.show { display: flex; }
+    .err { display: none; font-size: 12px; color: hsl(0 70% 45%); margin-top: 10px; }
+    .err.show { display: block; }
+    .term {
+      margin-top: 36px;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 13px;
+      background: hsl(30 22% 8%);
+      color: hsl(38 30% 90%);
+      padding: 14px 18px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 0;
+      cursor: pointer;
+    }
+    .term .dollar { color: hsl(262 40% 65%); }
+    .term .hint { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.45; }
+    .note {
+      margin-top: 14px;
+      font-size: 12px;
+      color: hsl(30 10% 50%);
+    }
+    footer {
+      margin-top: 56px;
+      display: flex;
+      gap: 18px;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 12px;
+    }
+    footer a { color: hsl(30 10% 50%); text-decoration: none; }
+    footer a:hover { color: hsl(262 70% 45%); }
+    .banner {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: hsl(30 10% 50%);
+      background: hsl(38 45% 97%);
+      border: 1px solid hsl(38 22% 86%);
+      border-radius: 999px;
+      padding: 6px 12px;
+      white-space: nowrap;
+    }
+    .banner a { color: hsl(262 70% 45%); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="banner">preview · <a href="/">live site</a></div>
+  <main>
+    <button class="mark" id="stone" type="button" aria-label="Cycle share tier">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="24" y2="24">
+            <stop id="ga" offset="0" stop-color="#ddd6fe" />
+            <stop id="gb" offset="1" stop-color="#c4b5fd" />
+          </linearGradient>
+        </defs>
+        <path d="M12 3 L19 9 L12 21 L5 9 Z" fill="url(#g)" />
+        <path d="M12 3 L12 12 L5 9 Z" fill="rgba(255,255,255,0.28)" />
+        <path d="M12 3 L12 12 L19 9 Z" fill="rgba(255,255,255,0.1)" />
+        <path d="M12 12 L5 9 L12 21 Z" fill="rgba(0,0,0,0.08)" />
+        <path d="M12 12 L19 9 L12 21 Z" fill="rgba(0,0,0,0.03)" />
+      </svg>
+    </button>
+
+    <p class="tier" id="tier">pulse</p>
+    <h1>Your AI subscription<br>should <span class="accent">pay you back.</span></h1>
+    <p class="sub" id="line">Loop stats only. No prompts, no tool args, no paths.</p>
+
+    <form id="form">
+      <input type="email" required placeholder="you@example.com" id="email" />
+      <button class="btn" type="submit">Join waitlist</button>
+    </form>
+    <div class="ok" id="ok">You're on the list. We'll email once.</div>
+    <p class="err" id="err">Something went wrong. Try again.</p>
+
+    <button class="term" id="copy" type="button">
+      <span class="dollar">$</span>
+      <span>curl -fsSL iolit.dev/install | sh</span>
+      <span class="hint" id="copied">copy</span>
+    </button>
+    <p class="note">click the stone. pulse, then trace, then raw.</p>
+
+    <footer>
+      <a href="/">live</a>
+      <a href="/privacy">privacy</a>
+      <a href="/terms">terms</a>
+      <a href="https://github.com/Emad-log/iolit-client">source</a>
+    </footer>
+  </main>
+  <script>
+    const tiers = [
+      { name: "pulse", a: "#ddd6fe", b: "#c4b5fd", line: "Loop stats only. No prompts, no tool args, no paths." },
+      { name: "trace", a: "#a78bfa", b: "#6d28d9", line: "Tool args and results. Secrets stripped. Paths scrubbed." },
+      { name: "raw", a: "#6d28d9", b: "#2e1065", line: "Also prompts, replies, and thinking. Type YES in the client." },
+    ];
+    let i = 0;
+    const stone = document.getElementById("stone");
+    const ga = document.getElementById("ga");
+    const gb = document.getElementById("gb");
+    const tierEl = document.getElementById("tier");
+    const lineEl = document.getElementById("line");
+
+    function paint() {
+      const t = tiers[i];
+      ga.setAttribute("stop-color", t.a);
+      gb.setAttribute("stop-color", t.b);
+      tierEl.textContent = t.name;
+      lineEl.textContent = t.line;
+    }
+
+    stone.addEventListener("click", () => {
+      i = (i + 1) % tiers.length;
+      paint();
+    });
+
+    document.getElementById("copy").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText("curl -fsSL iolit.dev/install | sh");
+      } catch {}
+      const hint = document.getElementById("copied");
+      hint.textContent = "copied";
+      setTimeout(() => { hint.textContent = "copy"; }, 1600);
+    });
+
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const err = document.getElementById("err");
+      err.classList.remove("show");
+      try {
+        const res = await fetch("/api/waitlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, source: "preview" }),
+        });
+        if (!res.ok) throw new Error("bad");
+        document.getElementById("form").style.display = "none";
+        document.getElementById("ok").classList.add("show");
+      } catch {
+        err.classList.add("show");
+      }
+    });
+  </script>
+</body>
+</html>

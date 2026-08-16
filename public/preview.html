@@ -62,8 +62,11 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 64px 24px calc(88px + clamp(300px, 38vh, 400px) + 20px);
+      padding: 56px 20px calc(88px + clamp(280px, 36vh, 380px) + 20px);
       pointer-events: none;
+    }
+    @media (min-width: 640px) {
+      main { padding: 64px 24px calc(88px + clamp(300px, 38vh, 400px) + 20px); }
     }
     .copy {
       width: 100%;
@@ -173,7 +176,15 @@
       -webkit-user-select: none;
     }
     @media (hover: none) {
-      .pad { display: flex; }
+      .pad {
+        display: flex;
+        position: fixed;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+        z-index: 2;
+        margin: 0;
+      }
     }
     .pad button {
       font-family: ui-monospace, Menlo, monospace;
@@ -182,10 +193,11 @@
       height: 44px;
       border-radius: 12px;
       border: 1px solid hsl(38 22% 82%);
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.8);
       color: hsl(30 22% 20%);
       cursor: pointer;
       touch-action: manipulation;
+      backdrop-filter: blur(3px);
     }
     .pad button:active { background: hsl(262 70% 45%); color: #faf7f0; }
     footer {
@@ -318,13 +330,13 @@
       cv.height = Math.floor(window.innerHeight * dpr);
       g.setTransform(dpr * S, 0, 0, dpr * S, 0, 0);
 
-      H = 9;
+      const rows = window.innerHeight < 700 ? 8 : 9;
       W = Math.max(26, Math.ceil(w / T) + 1);
+      H = rows;
       grid = new Uint8Array(W * H);
       caveTop = h - H * T;
 
       for (let tx = 0; tx < W; tx++) {
-        setAt(tx, 0, O.ROCK);
         setAt(tx, H - 2, O.ROCK);
         setAt(tx, H - 1, O.ROCK);
       }
@@ -335,9 +347,9 @@
 
       const dirtL = Math.floor(W * 0.42);
       const dirtR = Math.floor(W * 0.58);
-      for (let ty = 3; ty < H - 2; ty++) {
-        for (let tx = dirtL; tx <= dirtR; tx++) setAt(tx, ty, O.DIRT);
-      }
+      for (let tx = dirtL; tx <= dirtR; tx++) setAt(tx, H - 3, O.DIRT);
+      for (let tx = dirtL + 1; tx <= dirtR - 1; tx++) setAt(tx, H - 4, O.DIRT);
+      for (let tx = dirtL + 2; tx <= dirtR - 2; tx++) setAt(tx, H - 5, O.DIRT);
 
       forge = { tx: W - 4, ty: H - 3 };
       setAt(forge.tx, forge.ty, O.FORGE);
@@ -352,8 +364,8 @@
           spawnGem(tx, H - 3, tier, "rock");
         }
       }
-      spawnGem(dirtL + 2, 4, "trace", "dirt");
-      spawnGem(dirtR - 2, 5, "raw", "dirt");
+      spawnGem(dirtL + 2, H - 4, "trace", "dirt");
+      spawnGem(dirtR - 2, H - 5, "raw", "dirt");
 
       miner.tx = 2;
       miner.ty = H - 3;
@@ -552,10 +564,10 @@
       }
       const dirtL = Math.floor(W * 0.42);
       const dirtR = Math.floor(W * 0.58);
-      spawnGem(dirtL + 2, 4, "trace", "dirt");
-      spawnGem(dirtR - 2, 5, "raw", "dirt");
-      setAt(dirtL + 2, 4, O.DIRT);
-      setAt(dirtR - 2, 5, O.DIRT);
+      spawnGem(dirtL + 2, H - 4, "trace", "dirt");
+      spawnGem(dirtR - 2, H - 5, "raw", "dirt");
+      setAt(dirtL + 2, H - 4, O.DIRT);
+      setAt(dirtR - 2, H - 5, O.DIRT);
     }
 
     function deposit() {
@@ -877,8 +889,11 @@
       g.clearRect(-4, -4, w + 8, h + 8);
       drawSky(w, h);
 
+      const camMax = Math.max(0, W * T - w);
+      const cam = Math.min(camMax, Math.max(0, miner.fx + 8 - w / 2));
+
       g.save();
-      g.translate(0, caveTop);
+      g.translate(-cam, caveTop);
       for (let ty = 0; ty < H; ty++) {
         for (let tx = 0; tx < W; tx++) drawTile(tx, ty);
       }

@@ -220,7 +220,7 @@
       <p class="tiers">pulse · trace · raw</p>
       <div class="pad">
         <button id="b-l" aria-label="left">◀</button>
-        <button id="b-j" aria-label="up">▲</button>
+        <button id="b-j" aria-label="jump">▲</button>
         <button id="b-m" aria-label="mine">⛏</button>
         <button id="b-r" aria-label="right">▶</button>
       </div>
@@ -258,17 +258,17 @@
       }
     });
 
-    // Boulder Dash style cave, reskinned for iolit.
+    // Grid digging engine, light cave cutaway pinned to the bottom.
     const T = 16;
     const S = 2.5;
-    const O = { SPACE: 0, DIRT: 1, BRICK: 2, STEEL: 3, FORGE: 4 };
+    const O = { SPACE: 0, DIRT: 1, ROCK: 2, FORGE: 3 };
     const TIERS = {
-      pulse: { color: "#c4b5fd", mid: "#a78bfa", dark: "#6d28d9", hi: "#ffffff", coins: 1 },
+      pulse: { color: "#d9ccfd", mid: "#b39df7", dark: "#7c5cf0", hi: "#ffffff", coins: 1 },
       trace: { color: "#a78bfa", mid: "#8b5cf6", dark: "#5b21b6", hi: "#ffffff", coins: 4 },
       raw: { color: "#7c3aed", mid: "#5b21b6", dark: "#3b0a63", hi: "#ffffff", coins: 12 },
     };
-    const DIRT_A = "#e7e1d3", DIRT_B = "#ddd5c4", DIRT_HI = "#f5f1e6", DIRT_LO = "#c4b99f";
-    const BRICK_A = "#cfc7b7", BRICK_HI = "#e3ddcf", BRICK_LO = "#a89e8a", BRICK_LINE = "#8d8371";
+    const ROCK_A = "#e3ddcd", ROCK_HI = "#f2eee2", ROCK_LO = "#c9c0ac", ROCK_LINE = "#a99f8a";
+    const DIRT_A = "#ece6d6", DIRT_B = "#e6dfcc", DIRT_HI = "#f7f3e9", DIRT_LO = "#d2c8b0";
 
     const cv = document.getElementById("world");
     const g = cv.getContext("2d");
@@ -279,14 +279,12 @@
     let gems = [];
     let particles = [];
     let floats = [];
-    let dust = [];
     let smoke = [];
-    let clouds = [];
     let coins = 0, gemsMined = 0;
     let frame = 0;
     let forge = { tx: 0, ty: 0 };
     let shake = 0;
-    let lastGemTick = 0;
+    let caveTop = 0;
 
     const miner = {
       tx: 1, ty: 1,
@@ -297,7 +295,7 @@
       mineAnim: 0,
       carry: [],
     };
-    let inputDir = 0;
+    let inputDir = -1;
     let path = [];
     let lastInput = -1e9;
     let pathTimer = 0;
@@ -305,7 +303,7 @@
     const now = () => performance.now();
 
     function at(tx, ty) {
-      if (tx < 0 || tx >= W || ty < 0 || ty >= H) return O.STEEL;
+      if (tx < 0 || tx >= W || ty < 0 || ty >= H) return O.ROCK;
       return grid[ty * W + tx];
     }
     function setAt(tx, ty, v) {
@@ -320,47 +318,45 @@
       cv.height = Math.floor(window.innerHeight * dpr);
       g.setTransform(dpr * S, 0, 0, dpr * S, 0, 0);
 
-      const rows = 9;
+      H = 9;
       W = Math.max(26, Math.ceil(w / T) + 1);
-      H = rows;
       grid = new Uint8Array(W * H);
+      caveTop = h - H * T;
 
       for (let tx = 0; tx < W; tx++) {
-        setAt(tx, 0, O.STEEL);
-        setAt(tx, H - 2, O.STEEL);
-        setAt(tx, H - 1, O.STEEL);
+        setAt(tx, 0, O.ROCK);
+        setAt(tx, H - 2, O.ROCK);
+        setAt(tx, H - 1, O.ROCK);
       }
       for (let ty = 0; ty < H; ty++) {
-        setAt(0, ty, O.STEEL);
-        setAt(W - 1, ty, O.STEEL);
+        setAt(0, ty, O.ROCK);
+        setAt(W - 1, ty, O.ROCK);
       }
 
-      for (let ty = 1; ty < H - 2; ty++) {
-        for (let tx = 1; tx < W - 1; tx++) setAt(tx, ty, O.DIRT);
-      }
-      const pillars = [[0.22, 3], [0.4, 2], [0.58, 3], [0.75, 2]];
-      for (const [fx, len] of pillars) {
-        const tx = Math.floor(W * fx);
-        for (let i = 0; i < len; i++) {
-          if (tx + i < W - 4) setAt(tx + i, 3, O.BRICK);
-        }
+      const dirtL = Math.floor(W * 0.42);
+      const dirtR = Math.floor(W * 0.58);
+      for (let ty = 3; ty < H - 2; ty++) {
+        for (let tx = dirtL; tx <= dirtR; tx++) setAt(tx, ty, O.DIRT);
       }
 
-      forge = { tx: W - 3, ty: 3 };
+      forge = { tx: W - 4, ty: H - 3 };
       setAt(forge.tx, forge.ty, O.FORGE);
-      setAt(forge.tx, forge.ty + 1, O.STEEL);
-      setAt(forge.tx, forge.ty - 1, O.STEEL);
-      setAt(W - 2, forge.ty, O.STEEL);
+      setAt(forge.tx - 1, forge.ty, O.ROCK);
 
       gems = [];
-      const spots = [[0.12, 2, "pulse"], [0.2, 4, "trace"], [0.3, 2, "trace"], [0.44, 5, "raw"], [0.52, 2, "pulse"], [0.64, 4, "trace"], [0.72, 5, "raw"], [0.81, 3, "pulse"]];
-      for (const [fx, fy, tier] of spots) {
+      const boulderSpots = [[0.14, "pulse"], [0.28, "trace"], [0.36, "trace"], [0.68, "pulse"], [0.8, "raw"]];
+      for (const [fx, tier] of boulderSpots) {
         const tx = Math.floor(W * fx);
-        if (tx > 0 && tx < W - 1) spawnGem(tx, fy, tier);
+        if (tx > 1 && tx < W - 4) {
+          setAt(tx, H - 3, O.ROCK);
+          spawnGem(tx, H - 3, tier, "rock");
+        }
       }
+      spawnGem(dirtL + 2, 4, "trace", "dirt");
+      spawnGem(dirtR - 2, 5, "raw", "dirt");
 
       miner.tx = 2;
-      miner.ty = 2;
+      miner.ty = H - 3;
       miner.fx = miner.tx * T;
       miner.fy = miner.ty * T;
       miner.carry = [];
@@ -369,26 +365,10 @@
       floats = [];
       smoke = [];
       path = [];
-
-      dust = [];
-      for (let i = 0; i < 18; i++) {
-        dust.push({
-          x: Math.random() * w,
-          y: Math.random() * ((H - 2) * T - 30),
-          vx: -0.06 - Math.random() * 0.1,
-          vy: 0.03 + Math.random() * 0.05,
-          s: Math.random() > 0.6 ? 2 : 1,
-        });
-      }
-      clouds = [
-        { x: w * 0.2, y: h * 0.14, s: 1.0, v: 0.05 },
-        { x: w * 0.55, y: h * 0.09, s: 1.4, v: 0.07 },
-        { x: w * 0.8, y: h * 0.18, s: 0.8, v: 0.04 },
-      ];
     }
 
-    function spawnGem(tx, ty, tier) {
-      gems.push({ tx, ty, tier, state: "wall", spark: 40 + (Math.random() * 60 | 0) });
+    function spawnGem(tx, ty, tier, host) {
+      gems.push({ tx, ty, tier, state: "inrock", host, crack: 0, spark: 40 + (Math.random() * 60 | 0) });
     }
 
     function touchUser() { lastInput = now(); }
@@ -408,17 +388,19 @@
         else setInput(map[k]);
       }
     });
+    function dirFromFace(f) { return f === -1 ? 3 : 1; }
     function mineTap() {
       touchUser();
-      if (miner.mineAnim > 0) return;
-      const ftx = miner.tx + DX[dirFromFace(miner.face)];
-      const fty = miner.ty + DY[dirFromFace(miner.face)];
-      if (at(ftx, fty) === O.DIRT) {
+      if (miner.mineAnim > 0 || miner.moving) return;
+      const d = dirFromFace(miner.face);
+      const ftx = miner.tx + DX[d];
+      const fty = miner.ty + DY[d];
+      const gm = gems.find((x) => x.state === "inrock" && x.tx === ftx && x.ty === fty);
+      if (at(ftx, fty) === O.DIRT || gm) {
         miner.mineAnim = 14;
-        miner.face = dirFromFace(miner.face);
+        path = [];
       }
     }
-    function dirFromFace(f) { return f === -1 ? 3 : 1; }
 
     function hold(id, dir) {
       const el = document.getElementById(id);
@@ -431,12 +413,12 @@
     hold("b-l", 3); hold("b-r", 1); hold("b-j", 0); hold("b-m", "m");
 
     function gemAtTile(tx, ty) {
-      return gems.find((gm) => gm.state === "wall" && gm.tx === tx && gm.ty === ty);
+      return gems.find((gm) => (gm.state === "inrock" || gm.state === "dirt") && gm.tx === tx && gm.ty === ty);
     }
 
     function passable(tx, ty) {
       const v = at(tx, ty);
-      return v === O.SPACE || v === O.DIRT || v === O.FORGE || !!gemAtTile(tx, ty);
+      return v === O.SPACE || v === O.DIRT || v === O.FORGE;
     }
 
     function bfs(fromTx, fromTy, goalFn) {
@@ -476,28 +458,51 @@
     function autopilot() {
       if (reduce) return;
       if (now() - lastInput < 4200) return;
+      if (miner.moving || miner.mineAnim > 0) return;
 
-      if (miner.carry.length >= 3 || (miner.carry.length > 0 && !gems.some((gm) => gm.state === "wall"))) {
-        if (miner.tx === forge.tx - 1 && miner.ty === forge.ty) {
+      const live = gems.filter((gm) => gm.state === "inrock" || gm.state === "dirt");
+
+      if (miner.carry.length >= 3 || (miner.carry.length > 0 && !live.length)) {
+        if (miner.tx === forge.tx && miner.ty === forge.ty) {
           deposit();
           return;
         }
         if (!path.length || pathTimer <= 0) {
-          path = bfs(miner.tx, miner.ty, (x, y) => x === forge.tx - 1 && y === forge.ty) || [];
-          pathTimer = 30;
+          path = bfs(miner.tx, miner.ty, (x, y) => x === forge.tx && y === forge.ty) || [];
+          pathTimer = 40;
         }
-      } else {
-        const live = gems.filter((gm) => gm.state === "wall");
-        if (!live.length) return;
+      } else if (live.length) {
         let best = null, bd = 1e9;
         for (const gm of live) {
           const d = Math.abs(gm.tx - miner.tx) + Math.abs(gm.ty - miner.ty);
           if (d < bd) { bd = d; best = gm; }
         }
         if (!best) return;
+
+        const beside = (miner.tx === best.tx - 1 && miner.ty === best.ty)
+          || (miner.tx === best.tx + 1 && miner.ty === best.ty)
+          || (miner.tx === best.tx && (miner.ty === best.ty - 1 || miner.ty === best.ty + 1));
+        if (beside) {
+          miner.face = best.tx > miner.tx ? 1 : best.tx < miner.tx ? -1 : miner.face;
+          path = [];
+          if (best.host === "rock") {
+            if (at(best.tx, best.ty) === O.ROCK) {
+              mineTap();
+              return;
+            }
+          } else {
+            if (best.ty > miner.ty) setInput(2);
+            else if (best.ty < miner.ty) setInput(0);
+            else setInput(miner.face === 1 ? 1 : 3);
+            return;
+          }
+        }
         if (!path.length || pathTimer <= 0) {
-          path = bfs(miner.tx, miner.ty, (x, y) => x === best.tx && y === best.ty) || [];
-          pathTimer = 30;
+          const goal = best.host === "rock"
+            ? ((x, y) => (x === best.tx - 1 || x === best.tx + 1) && y === best.ty)
+            : ((x, y) => x === best.tx && y === best.ty);
+          path = bfs(miner.tx, miner.ty, goal) || [];
+          pathTimer = 40;
         }
       }
       if (pathTimer > 0) pathTimer -= 1;
@@ -507,42 +512,50 @@
       const nx = miner.tx + DX[dir];
       const ny = miner.ty + DY[dir];
       const v = at(nx, ny);
-      if (v === O.STEEL || v === O.BRICK) return false;
-      if (v === O.DIRT || v === O.SPACE || v === O.FORGE || gemAtTile(nx, ny)) {
+      if (v === O.SPACE || v === O.DIRT || v === O.FORGE) {
         if (v === O.DIRT) {
+          const gm = gems.find((x) => x.host === "dirt" && x.state === "dirt" && x.tx === nx && x.ty === ny);
+          if (gm && miner.carry.length < 3) collect(gm);
           setAt(nx, ny, O.SPACE);
           puff(nx * T + 8, ny * T + 8);
         }
+        if (v === O.FORGE && miner.carry.length) deposit();
         miner.tx = nx;
         miner.ty = ny;
         miner.moving = true;
         miner.walk = (miner.walk + 1) % 16;
-        const gm = gemAtTile(nx, ny);
-        if (gm && miner.carry.length < 3) {
-          gm.state = "carried";
-          miner.carry.push(gm.tier);
-          gemsMined += 1;
-          burst(nx * T + 8, ny * T + 8, TIERS[gm.tier]);
-          shake = 4;
-          setTimeout(() => {
-            gm.state = "done";
-            if (!gems.some((x) => x.state === "wall")) respawnAll();
-          }, 500);
-        }
-        if (v === O.FORGE) deposit();
         return true;
       }
       return false;
     }
 
+    function collect(gm) {
+      gm.state = "carried";
+      miner.carry.push(gm.tier);
+      gemsMined += 1;
+      burst(gm.tx * T + 8, gm.ty * T + 8, TIERS[gm.tier]);
+      shake = 4;
+      setTimeout(() => {
+        gm.state = "done";
+        if (!gems.some((x) => x.state === "inrock" || x.state === "dirt")) respawnAll();
+      }, 500);
+    }
+
     function respawnAll() {
-      const spots = [[0.12, 2, "pulse"], [0.2, 4, "trace"], [0.3, 2, "trace"], [0.44, 5, "raw"], [0.52, 2, "pulse"], [0.64, 4, "trace"], [0.72, 5, "raw"], [0.81, 3, "pulse"]];
-      for (const [fx, fy, tier] of spots) {
+      const boulderSpots = [[0.14, "pulse"], [0.28, "trace"], [0.36, "trace"], [0.68, "pulse"], [0.8, "raw"]];
+      for (const [fx, tier] of boulderSpots) {
         const tx = Math.floor(W * fx);
-        if (tx > 0 && tx < W - 1 && !gems.some((gm) => gm.tx === tx && gm.ty === fy && gm.state !== "done")) {
-          spawnGem(tx, fy, tier);
+        if (tx > 1 && tx < W - 4) {
+          setAt(tx, H - 3, O.ROCK);
+          spawnGem(tx, H - 3, tier, "rock");
         }
       }
+      const dirtL = Math.floor(W * 0.42);
+      const dirtR = Math.floor(W * 0.58);
+      spawnGem(dirtL + 2, 4, "trace", "dirt");
+      spawnGem(dirtR - 2, 5, "raw", "dirt");
+      setAt(dirtL + 2, 4, O.DIRT);
+      setAt(dirtR - 2, 5, O.DIRT);
     }
 
     function deposit() {
@@ -601,9 +614,23 @@
           const ftx = miner.tx + DX[d];
           const fty = miner.ty + DY[d];
           if (at(ftx, fty) === O.DIRT) {
+            const gm = gems.find((x) => x.host === "dirt" && x.state === "dirt" && x.tx === ftx && x.ty === fty);
+            if (gm && miner.carry.length < 3) collect(gm);
             setAt(ftx, fty, O.SPACE);
             puff(ftx * T + 8, fty * T + 8);
             shake = 3;
+            path = [];
+          } else if (at(ftx, fty) === O.ROCK) {
+            const gm = gems.find((x) => x.host === "rock" && x.state === "inrock" && x.tx === ftx && x.ty === fty);
+            if (gm) {
+              gm.crack += 1;
+              shake = 5;
+              puff(ftx * T + 8, fty * T + 6);
+              if (gm.crack >= 2) {
+                setAt(ftx, fty, O.SPACE);
+                collect(gm);
+              }
+            }
             path = [];
           }
         }
@@ -625,6 +652,7 @@
           if (dir === 1) miner.face = 1;
           if (dir === 3) miner.face = -1;
           if (!stepMiner(dir)) path = [];
+          inputDir = -1;
         }
       } else {
         const txp = miner.tx * T;
@@ -635,17 +663,6 @@
           miner.fx = txp;
           miner.fy = typ;
           miner.moving = false;
-        }
-      }
-
-      if (frame - lastGemTick > 6) {
-        lastGemTick = frame;
-        for (const gm of gems) {
-          if (gm.state !== "wall") continue;
-          if (at(gm.tx, gm.ty + 1) === O.SPACE) {
-            gm.ty += 1;
-            path = [];
-          }
         }
       }
     }
@@ -791,17 +808,23 @@
       }
     }
 
-    function drawGemTile(gm) {
-      if (gm.state !== "wall") return;
+    function drawGemRock(gm) {
+      if (gm.state !== "inrock" && gm.state !== "dirt") return;
       const x = gm.tx * T, y = gm.ty * T;
       const tier = TIERS[gm.tier];
       const tw = frame % 28 < 4;
-      px(x + 3, y + 1, 10, 2, tier.color);
-      px(x + 1, y + 3, 14, 3, tier.color);
-      px(x + 3, y + 6, 10, 2, tier.mid);
-      px(x + 2, y + 4, 3, 2, tier.hi);
-      px(x + 9, y + 5, 2, 1, tier.dark);
-      px(x + 6, y + 2, 2, 2, tw ? "#ffffff" : tier.hi);
+      const on = gm.host === "rock" ? y + 4 : y;
+      px(x + 4, on, 8, 2, tier.color);
+      px(x + 2, on + 2, 12, 3, tier.color);
+      px(x + 4, on + 5, 8, 2, tier.mid);
+      px(x + 3, on + 3, 3, 2, tier.hi);
+      px(x + 10, on + 4, 2, 1, tier.dark);
+      px(x + 7, on + 1, 2, 2, tw ? "#ffffff" : tier.hi);
+      if (gm.crack === 1) {
+        px(x + 3, y + 8, 1, 3, "#7d756a");
+        px(x + 7, y + 10, 2, 1, "#7d756a");
+        px(x + 12, y + 8, 1, 3, "#7d756a");
+      }
     }
 
     function drawTile(tx, ty) {
@@ -815,27 +838,20 @@
         if ((tx * 11 + ty * 7) % 6 === 0) px(x + 2, y + 3, 1, 1, DIRT_LO);
         return;
       }
-      if (v === O.BRICK) {
-        px(x, y, T, T, BRICK_A);
-        px(x, y, T, 2, BRICK_HI);
-        px(x, y + T - 2, T, 2, BRICK_LO);
-        px(x, y + 7, T, 2, BRICK_LINE);
-        px(x + 7, y, 2, 7, BRICK_LINE);
-        px(x + 7, y + 9, 2, 7, BRICK_LINE);
-        return;
-      }
-      if (v === O.STEEL) {
-        px(x, y, T, T, "#b9b0a0");
-        px(x, y, T, 3, "#d5cdbd");
-        px(x, y + T - 3, T, 3, "#948b7a");
-        px(x, y + T - 1, T, 1, "#7d7567");
-        if ((tx * 7 + ty * 13) % 4 === 0) px(x + 4, y + 8, 2, 2, "#a49a88");
+      if (v === O.ROCK) {
+        px(x, y, T, T, ROCK_A);
+        px(x, y, T, 3, ROCK_HI);
+        px(x, y + T - 3, T, 3, ROCK_LO);
+        px(x, y + T - 1, T, 1, ROCK_LINE);
+        if ((tx * 7 + ty * 13) % 5 === 0) px(x + 6, y + 7, 2, 2, ROCK_LO);
+        if ((tx * 3 + ty * 5) % 7 === 0) px(x + 3, y + 4, 1, 1, ROCK_HI);
         return;
       }
       if (v === O.FORGE) {
         px(x, y, T, T, "#8a5a2b");
         px(x, y, T, 3, "#a5713f");
         px(x, y + T - 2, T, 2, "#6d4520");
+        px(x + 6, y + 6, 4, 3, "#f5c542");
         const fire = Math.floor(frame / 6) % 3;
         px(x + 3, y - 3, 10, 3, "#6d28d9");
         px(x + 5, y - 3 - fire, 6, 2 + fire, "#a78bfa");
@@ -844,31 +860,11 @@
     }
 
     function drawSky(w, h) {
-      const sky = g.createLinearGradient(0, 0, 0, h * 0.7);
-      sky.addColorStop(0, "#f6f2fb");
+      const sky = g.createLinearGradient(0, 0, 0, h);
+      sky.addColorStop(0, "#f8f5fc");
       sky.addColorStop(1, "#ffffff");
       g.fillStyle = sky;
       g.fillRect(0, 0, w, h);
-      for (const c of clouds) {
-        g.fillStyle = "rgba(214, 200, 240, 0.5)";
-        g.beginPath();
-        g.ellipse(c.x, c.y, 34 * c.s, 10 * c.s, 0, 0, Math.PI * 2);
-        g.fill();
-        g.beginPath();
-        g.ellipse(c.x - 22 * c.s, c.y + 4 * c.s, 22 * c.s, 8 * c.s, 0, 0, Math.PI * 2);
-        g.fill();
-        g.beginPath();
-        g.ellipse(c.x + 24 * c.s, c.y + 5 * c.s, 20 * c.s, 7 * c.s, 0, 0, Math.PI * 2);
-        g.fill();
-      }
-      g.fillStyle = "rgba(216, 202, 242, 0.55)";
-      g.beginPath();
-      g.ellipse(w * 0.15, H * T + 30, w * 0.4, 26, 0, 0, Math.PI * 2);
-      g.fill();
-      g.fillStyle = "rgba(226, 214, 246, 0.6)";
-      g.beginPath();
-      g.ellipse(w * 0.7, H * T + 34, w * 0.35, 20, 0, 0, Math.PI * 2);
-      g.fill();
     }
 
     function drawWorld() {
@@ -881,19 +877,12 @@
       g.clearRect(-4, -4, w + 8, h + 8);
       drawSky(w, h);
 
-      for (const d of dust) {
-        g.fillStyle = "rgba(90, 78, 62, 0.10)";
-        g.fillRect(Math.round(d.x), Math.round(d.y), d.s, d.s);
-      }
-      for (const s of smoke) {
-        g.fillStyle = "rgba(120, 110, 100, " + Math.max(0, 0.22 - s.age * 0.012) + ")";
-        g.fillRect(Math.round(s.x), Math.round(s.y), 3, 3);
-      }
-
+      g.save();
+      g.translate(0, caveTop);
       for (let ty = 0; ty < H; ty++) {
         for (let tx = 0; tx < W; tx++) drawTile(tx, ty);
       }
-      for (const gm of gems) drawGemTile(gm);
+      for (const gm of gems) drawGemRock(gm);
 
       for (const p of particles) {
         g.globalAlpha = Math.max(0, p.life / 34);
@@ -908,14 +897,14 @@
 
       drawMiner();
 
-      const live = gems.filter((gm) => gm.state === "wall");
+      const live = gems.filter((gm) => gm.state === "inrock" || gm.state === "dirt");
       if (miner.carry.length >= 3 || !live.length) {
         if (miner.carry.length) {
           const bob = frame % 40 < 20 ? 0 : 3;
           g.fillStyle = "rgba(60, 50, 40, 0.55)";
           g.font = "8px ui-monospace, Menlo, monospace";
           g.textAlign = "center";
-          g.fillText("▼", forge.tx * T + 8, forge.ty * T - 14 + bob);
+          g.fillText("▼", forge.tx * T + 8, forge.ty * T - 12 + bob);
           g.textAlign = "left";
         }
       } else {
@@ -941,6 +930,11 @@
         g.fillText(f.text, f.x, f.y);
         g.globalAlpha = 1;
       }
+      for (const s of smoke) {
+        g.fillStyle = "rgba(120, 110, 100, " + Math.max(0, 0.22 - s.age * 0.012) + ")";
+        g.fillRect(Math.round(s.x), Math.round(s.y), 3, 3);
+      }
+      g.restore();
       g.restore();
 
       g.font = "9px ui-monospace, Menlo, monospace";
@@ -963,12 +957,6 @@
       particles = particles.filter((p) => p.life > 0);
       for (const f of floats) { f.y -= 0.4; f.life -= 1; }
       floats = floats.filter((f) => f.life > 0);
-      for (const d of dust) {
-        d.x += d.vx;
-        d.y += d.vy;
-        if (d.x < -4) d.x = window.innerWidth / S + 4;
-        if (d.y > (H - 2) * T - 8) d.y = 4;
-      }
       for (const s of smoke) {
         s.y -= 0.35;
         s.age += 1;
@@ -977,12 +965,8 @@
       if (frame % 14 === 0) {
         smoke.push({ x: forge.tx * T + 8, y: forge.ty * T - 8, age: 0 });
       }
-      for (const c of clouds) {
-        c.x += c.v;
-        if (c.x > window.innerWidth / S + 60) c.x = -60;
-      }
       for (const gm of gems) {
-        if (gm.state !== "wall") continue;
+        if (gm.state !== "inrock" && gm.state !== "dirt") continue;
         gm.spark -= 1;
         if (gm.spark <= 0) {
           gm.spark = 60 + (Math.random() * 80 | 0);

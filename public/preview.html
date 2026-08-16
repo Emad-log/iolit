@@ -24,10 +24,18 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { min-height: 100%; }
     body {
-      background: hsl(38 40% 95%);
-      color: hsl(30 22% 12%);
+      background: #170f24;
+      color: #f2ebdd;
       font-family: Inter, system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
+    }
+    canvas#world {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
     }
     .banner {
       position: fixed;
@@ -38,14 +46,14 @@
       font-size: 11px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: hsl(30 10% 50%);
-      background: hsl(38 45% 97% / 0.82);
-      border: 1px solid hsl(38 22% 86%);
+      color: #b6a6d6;
+      background: rgba(23, 15, 36, 0.72);
+      border: 1px solid rgba(167, 139, 250, 0.28);
       border-radius: 999px;
       padding: 6px 12px;
-      z-index: 2;
+      z-index: 3;
     }
-    .banner a { color: hsl(262 70% 45%); text-decoration: none; }
+    .banner a { color: #a78bfa; text-decoration: none; }
     main {
       position: relative;
       z-index: 1;
@@ -54,79 +62,40 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 56px 24px 36px;
-    }
-    .gamecard {
-      width: min(520px, 92vw);
-      margin-bottom: 30px;
-    }
-    canvas#game {
-      display: block;
-      width: 100%;
-      aspect-ratio: 2 / 1;
-      image-rendering: pixelated;
-      border-radius: 14px;
-      border: 1px solid hsl(38 22% 84%);
-      box-shadow: 0 18px 40px -18px rgba(46, 16, 91, 0.25);
-    }
-    .pad {
-      display: none;
-      gap: 8px;
-      justify-content: center;
-      margin-top: 10px;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    @media (hover: none) {
-      .pad { display: flex; }
-    }
-    .pad button {
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 13px;
-      width: 52px;
-      height: 40px;
-      border-radius: 10px;
-      border: 1px solid hsl(38 22% 80%);
-      background: hsl(38 45% 97%);
-      color: hsl(30 22% 20%);
-      cursor: pointer;
-    }
-    .pad button:active { background: hsl(262 70% 45%); color: #faf7f0; }
-    .hint {
-      margin-top: 10px;
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      color: hsl(30 10% 46%);
+      padding: 60px 24px 24px;
+      pointer-events: none;
     }
     .copy {
       width: 100%;
-      max-width: 420px;
+      max-width: 460px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      pointer-events: auto;
     }
     h1 {
       font-family: Fraunces, Georgia, serif;
       font-weight: 500;
       font-size: clamp(30px, 5vw, 46px);
-      line-height: 1.06;
+      line-height: 1.08;
       letter-spacing: -0.025em;
       text-align: center;
       margin-bottom: 12px;
+      text-shadow: 0 2px 24px rgba(10, 5, 20, 0.8);
     }
     .accent {
-      color: hsl(262 70% 38%);
+      color: #a78bfa;
       font-style: italic;
       padding-right: 0.3em;
     }
     .sub {
       font-size: 15px;
       line-height: 1.55;
-      color: hsl(30 10% 32%);
+      color: #b6a6d6;
       text-align: center;
       max-width: 340px;
       margin-bottom: 22px;
+      text-shadow: 0 1px 12px rgba(10, 5, 20, 0.8);
     }
     form {
       display: flex;
@@ -140,15 +109,16 @@
       height: 46px;
       padding: 0 18px;
       border-radius: 999px;
-      border: 1px solid hsl(38 22% 78%);
-      background: hsl(38 45% 97%);
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      background: rgba(23, 15, 36, 0.6);
       font-size: 14px;
-      color: hsl(30 22% 12%);
+      color: #f2ebdd;
       outline: none;
     }
+    input[type="email"]::placeholder { color: #8d7bb0; }
     input[type="email"]:focus {
-      border-color: hsl(262 70% 45%);
-      box-shadow: 0 0 0 3px hsl(262 70% 45% / 0.15);
+      border-color: #a78bfa;
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.18);
     }
     .btn {
       height: 46px;
@@ -156,7 +126,7 @@
       border: 0;
       border-radius: 999px;
       color: #faf7f0;
-      background: hsl(262 70% 45%);
+      background: #6d28d9;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
@@ -164,29 +134,29 @@
     }
     .ok { display: none; font-size: 15px; font-weight: 500; }
     .ok.show { display: block; }
-    .err { display: none; font-size: 12px; color: hsl(0 70% 45%); margin-top: 10px; }
+    .err { display: none; font-size: 12px; color: #f5a3b0; margin-top: 10px; }
     .err.show { display: block; }
     .term {
-      margin-top: 28px;
+      margin-top: 26px;
       font-family: ui-monospace, Menlo, monospace;
       font-size: 13px;
-      background: hsl(30 22% 10% / 0.92);
-      color: hsl(38 30% 90%);
-      padding: 14px 18px;
+      background: rgba(10, 5, 20, 0.55);
+      color: #d8c9f2;
+      border: 1px solid rgba(167, 139, 250, 0.22);
+      padding: 13px 18px;
       border-radius: 12px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      border: 0;
       cursor: pointer;
     }
-    .term .dollar { color: hsl(262 40% 70%); }
+    .term .dollar { color: #a78bfa; }
     .term .hint {
       margin-left: 10px;
       font-size: 11px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      opacity: 0.4;
+      opacity: 0.45;
     }
     .tiers {
       margin-top: 14px;
@@ -194,33 +164,46 @@
       font-size: 11px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: hsl(30 10% 40%);
+      color: #8d7bb0;
     }
+    .pad {
+      display: none;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 14px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    @media (hover: none) {
+      .pad { display: flex; }
+    }
+    .pad button {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 13px;
+      width: 52px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      background: rgba(23, 15, 36, 0.7);
+      color: #d8c9f2;
+      cursor: pointer;
+    }
+    .pad button:active { background: #6d28d9; color: #faf7f0; }
     footer {
-      margin-top: 32px;
+      margin-top: 26px;
       display: flex;
       gap: 18px;
       font-family: ui-monospace, Menlo, monospace;
       font-size: 12px;
     }
-    footer a { color: hsl(30 10% 42%); text-decoration: none; }
-    footer a:hover { color: hsl(262 70% 45%); }
+    footer a { color: #8d7bb0; text-decoration: none; }
+    footer a:hover { color: #a78bfa; }
   </style>
 </head>
 <body>
+  <canvas id="world" aria-hidden="true"></canvas>
   <div class="banner">preview · <a href="/">live site</a></div>
   <main>
-    <div class="gamecard">
-      <canvas id="game" aria-label="Playable pixel miner game"></canvas>
-      <div class="pad">
-        <button id="b-l" aria-label="left">◀</button>
-        <button id="b-j" aria-label="jump">▲</button>
-        <button id="b-m" aria-label="mine">⛏</button>
-        <button id="b-r" aria-label="right">▶</button>
-      </div>
-      <p class="hint" id="hint">move ← → · jump ↑ · mine space</p>
-    </div>
-
     <div class="copy">
       <h1>Your AI subscription<br>should <span class="accent">pay you back.</span></h1>
       <p class="sub">A silent agent for Claude, Cursor, and Codex. More you share, more you get paid.</p>
@@ -236,6 +219,12 @@
         <span class="hint" id="copied">copy</span>
       </button>
       <p class="tiers">pulse · trace · raw</p>
+      <div class="pad">
+        <button id="b-l" aria-label="left">◀</button>
+        <button id="b-j" aria-label="jump">▲</button>
+        <button id="b-m" aria-label="mine">⛏</button>
+        <button id="b-r" aria-label="right">▶</button>
+      </div>
       <footer>
         <a href="/">live</a>
         <a href="/privacy">privacy</a>
@@ -270,78 +259,98 @@
       }
     });
 
-    const TW = 160, TH = 80, T = 8;
-    const cv = document.getElementById("game");
-    cv.width = TW;
-    cv.height = TH;
-    const g = cv.getContext("2d");
-    g.imageSmoothingEnabled = false;
-
-    const ROCK = "#3a2c4d", ROCK_HI = "#55406b", ROCK_LO = "#241a33";
+    const T = 8;
     const TIERS = {
       pulse: { color: "#c4b5fd", hi: "#ede9fe", coins: 1 },
       trace: { color: "#8b5cf6", hi: "#ddd6fe", coins: 4 },
       raw: { color: "#4c1d95", hi: "#a78bfa", coins: 12 },
     };
+    const ROCK = "#332448", ROCK_HI = "#4a3766", ROCK_LO = "#1d1230";
 
-    const W = TW / T, H = TH / T;
-    const solid = new Uint8Array(W * H);
-    const gems = [];
-    let coins = 0, gemsMined = 0;
+    const cv = document.getElementById("world");
+    const g = cv.getContext("2d");
+    g.imageSmoothingEnabled = false;
+
+    let W = 0, H = 0, floorRow = 12;
+    let solid = new Uint8Array(0);
+    let gems = [];
     let particles = [];
     let floats = [];
+    let coins = 0, gemsMined = 0;
     let frame = 0;
+    let forgeX = 0;
+
+    const miner = {
+      x: 40, y: 0, vx: 0, vy: 0,
+      w: 8, h: 12,
+      facing: 1, grounded: false,
+      mine: 0, walk: 0,
+      carry: [],
+    };
+    const keys = {};
+    let mineQueued = false;
+    let lastInput = -1e9;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const now = () => performance.now();
 
     function tile(tx, ty) {
       if (tx < 0 || tx >= W || ty < 0 || ty >= H) return 1;
       return solid[ty * W + tx];
     }
-    function setTile(tx, ty, v) { solid[ty * W + tx] = v; }
+    function setTile(tx, ty, v) { if (tx >= 0 && tx < W && ty >= 0 && ty < H) solid[ty * W + tx] = v; }
 
-    function buildCave() {
-      solid.fill(0);
-      for (let y = 7; y < H; y++) for (let x = 0; x < W; x++) setTile(x, y, 1);
-      for (const [x0, x1, y] of [[6, 8, 5], [13, 14, 4]]) {
-        for (let x = x0; x <= x1; x++) setTile(x, y, 1);
+    function layout() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      cv.width = Math.floor(w * dpr);
+      cv.height = Math.floor(h * dpr);
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      W = Math.ceil(w / T) + 1;
+      H = Math.ceil(h / T) + 1;
+      floorRow = Math.max(12, Math.floor(h * 0.66 / T));
+      solid = new Uint8Array(W * H);
+
+      for (let ty = floorRow; ty < H; ty++) {
+        for (let tx = 0; tx < W; tx++) setTile(tx, ty, 1);
       }
-      spawnGemAt(2, 6, "pulse");
-      spawnGemAt(3, 6, "trace");
-      spawnGemAt(11, 6, "raw");
-      spawnGemAt(18, 6, "pulse");
-      spawnGemAt(7, 4, "trace");
-      spawnGemAt(13, 3, "raw");
+      for (let ty = floorRow - 9; ty < floorRow; ty++) {
+        for (let tx = 0; tx < 3; tx++) setTile(tx, ty, 1);
+      }
+      for (let tx = 10; tx <= 12; tx++) setTile(tx, floorRow - 4, 1);
+      forgeX = (W - 8) * T;
+      for (let tx = W - 8; tx < W - 4; tx++) setTile(tx, floorRow - 2, 1);
+      for (let tx = W - 8; tx < W - 4; tx++) setTile(tx, floorRow - 1, 1);
+
+      gems = [];
+      spawnGem(4, floorRow - 1, "pulse");
+      spawnGem(7, floorRow - 1, "trace");
+      spawnGem(14, floorRow - 1, "raw");
+      spawnGem(11, floorRow - 5, "trace");
+      spawnGem(12, floorRow - 5, "pulse");
+
+      miner.x = 5 * T;
+      miner.y = (floorRow - 1) * T - miner.h - 2;
+      miner.vx = 0; miner.vy = 0; miner.carry = [];
+      particles = [];
+      floats = [];
     }
 
-    function spawnGemAt(tx, ty, tier) {
-      gems.push({ tx, ty, tier, t: 0, mined: false });
+    function spawnGem(tx, ty, tier) {
+      gems.push({ tx, ty, tier, state: "wall", t: 0 });
     }
-    function respawnGem() {
-      const open = [];
-      for (let ty = 0; ty < 7; ty++) {
-        for (let tx = 0; tx < W; tx++) {
-          if (!tile(tx, ty)) continue;
-          if (!gems.some((gm) => gm.tx === tx && gm.ty === ty)) open.push([tx, ty]);
-        }
-      }
+    function respawnWall() {
+      const open = [
+        [4, floorRow - 1, "pulse"],
+        [7, floorRow - 1, "trace"],
+        [14, floorRow - 1, "raw"],
+        [11, floorRow - 5, "trace"],
+        [12, floorRow - 5, "pulse"],
+      ].filter(([tx, ty]) => !gems.some((gm) => gm.state !== "done" && gm.tx === tx && gm.ty === ty));
       if (!open.length) return;
-      const r = Math.random();
-      const tier = r < 0.6 ? "pulse" : r < 0.9 ? "trace" : "raw";
-      const [tx, ty] = open[(Math.random() * open.length) | 0];
-      spawnGemAt(tx, ty, tier);
+      const [tx, ty, tier] = open[(Math.random() * open.length) | 0];
+      spawnGem(tx, ty, tier);
     }
-
-    const miner = {
-      x: 8, y: 40, vx: 0, vy: 0,
-      w: 8, h: 12,
-      facing: 1, grounded: false,
-      mine: 0, walk: 0,
-    };
-    const keys = {};
-    let mineQueued = false;
-    let lastInput = -1e9;
-
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const now = () => performance.now();
 
     function touchUser() { lastInput = now(); }
 
@@ -353,82 +362,109 @@
     });
     window.addEventListener("keyup", (e) => { keys[e.key] = false; });
 
-    function hold(id, down) {
+    function hold(id, dir) {
       const el = document.getElementById(id);
       el.addEventListener("pointerdown", (e) => {
         e.preventDefault();
         touchUser();
-        if (id === "b-l") keys["ArrowLeft"] = true;
-        if (id === "b-r") keys["ArrowRight"] = true;
-        if (id === "b-j") keys["ArrowUp"] = true;
-        if (id === "b-m") mineQueued = true;
+        if (dir === "l") keys["ArrowLeft"] = true;
+        if (dir === "r") keys["ArrowRight"] = true;
+        if (dir === "j") keys["ArrowUp"] = true;
+        if (dir === "m") mineQueued = true;
       });
       el.addEventListener("pointerup", () => {
-        if (id === "b-l") keys["ArrowLeft"] = false;
-        if (id === "b-r") keys["ArrowRight"] = false;
-        if (id === "b-j") keys["ArrowUp"] = false;
+        if (dir === "l") keys["ArrowLeft"] = false;
+        if (dir === "r") keys["ArrowRight"] = false;
+        if (dir === "j") keys["ArrowUp"] = false;
       });
       el.addEventListener("pointerleave", () => {
-        if (id === "b-l") keys["ArrowLeft"] = false;
-        if (id === "b-r") keys["ArrowRight"] = false;
-        if (id === "b-j") keys["ArrowUp"] = false;
+        if (dir === "l") keys["ArrowLeft"] = false;
+        if (dir === "r") keys["ArrowRight"] = false;
+        if (dir === "j") keys["ArrowUp"] = false;
       });
     }
-    hold("b-l"); hold("b-r"); hold("b-j"); hold("b-m");
+    hold("b-l", "l"); hold("b-r", "r"); hold("b-j", "j"); hold("b-m", "m");
 
+    cv.style.pointerEvents = "auto";
     cv.addEventListener("pointerdown", (e) => {
       const rect = cv.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * TW;
-      const y = ((e.clientY - rect.top) / rect.height) * TH;
-      const tx = (x / T) | 0, ty = (y / T) | 0;
+      const x = (e.clientX - rect.left) / rect.width * window.innerWidth;
+      const y = (e.clientY - rect.top) / rect.height * window.innerHeight;
       touchUser();
-      const gem = gems.find((gm) => !gm.mined && gm.tx === tx && gm.ty === ty);
       const mx = miner.x + 4, my = miner.y + 6;
-      if (gem && Math.abs(tx * T - mx) <= T * 2.2 && Math.abs(ty * T - my) <= T * 2.2) {
-        miner.facing = tx * T >= mx ? 1 : -1;
+      if (inForge() && miner.carry.length) {
         mineQueued = true;
-      } else if (x > TW * 0.5) {
-        keys["ArrowRight"] = true;
-        setTimeout(() => { keys["ArrowRight"] = false; }, 220);
-      } else if (y < TH * 0.4) {
-        keys["ArrowUp"] = true;
-        setTimeout(() => { keys["ArrowUp"] = false; }, 160);
-      } else {
+      } else if (x < mx - 8) {
         keys["ArrowLeft"] = true;
-        setTimeout(() => { keys["ArrowLeft"] = false; }, 220);
+        setTimeout(() => { keys["ArrowLeft"] = false; }, 200);
+      } else if (x > mx + 8) {
+        keys["ArrowRight"] = true;
+        setTimeout(() => { keys["ArrowRight"] = false; }, 200);
+      } else {
+        keys["ArrowUp"] = true;
+        setTimeout(() => { keys["ArrowUp"] = false; }, 140);
       }
     });
+
+    function inForge() {
+      return miner.x + miner.w >= forgeX - T * 2 && miner.x <= forgeX + T * 5 && miner.grounded;
+    }
+
+    function frontTile() {
+      const tx = miner.facing === 1
+        ? ((miner.x + miner.w) / T | 0)
+        : ((miner.x - 1) / T | 0);
+      return [tx, ((miner.y + 4) / T) | 0];
+    }
+
+    function gemAt(tx, ty) {
+      return gems.find((gm) => gm.state === "wall" && gm.tx === tx && gm.ty === ty);
+    }
 
     function autopilot() {
       if (reduce) return;
       if (now() - lastInput < 4200) return;
-      const live = gems.filter((gm) => !gm.mined);
+      const [ftx, fty] = frontTile();
+
+      if (miner.carry.length >= 3 || (miner.carry.length > 0 && !gems.some((gm) => gm.state === "wall"))) {
+        if (inForge()) {
+          mineQueued = true;
+          return;
+        }
+        keys["ArrowRight"] = true;
+        keys["ArrowLeft"] = false;
+        keys["ArrowUp"] = false;
+        return;
+      }
+
+      const live = gems.filter((gm) => gm.state === "wall");
       if (!live.length) return;
       let best = null, bd = 1e9;
       const mx = miner.x + 4, my = miner.y + 6;
       for (const gm of live) {
-        const dx = gm.tx * T + 4 - mx;
-        const dy = gm.ty * T + 4 - my;
-        const d = Math.abs(dx) + Math.abs(dy);
+        const d = Math.abs(gm.tx * T + 4 - mx) + Math.abs(gm.ty * T + 4 - my);
         if (d < bd) { bd = d; best = gm; }
       }
       if (!best) return;
-      const frontTx = miner.facing === 1
-        ? ((miner.x + miner.w) / T | 0)
-        : ((miner.x - 1) / T | 0);
-      const bodyTy = ((miner.y + 4) / T) | 0;
-      const aligned = best.tx === frontTx && best.ty === bodyTy;
-      if (aligned && miner.grounded) {
+
+      if (best.tx === ftx && best.ty === fty && miner.grounded) {
         mineQueued = true;
         return;
       }
+
       const tx = best.tx * T + 4;
       miner.facing = tx >= mx ? 1 : -1;
       keys["ArrowLeft"] = tx < mx - 3;
       keys["ArrowRight"] = tx > mx + 3;
-      const aheadTx = miner.facing === 1 ? ((miner.x + miner.w) / T | 0) : ((miner.x - 1) / T | 0);
-      const chestSolid = tile(aheadTx, ((miner.y + 4) / T) | 0) || tile(aheadTx, ((miner.y - 2) / T) | 0);
-      keys["ArrowUp"] = chestSolid && miner.grounded && best.ty * T + 4 < my - 6;
+
+      const higher = best.ty * T + 4 < my - 8;
+      if (higher && miner.grounded) {
+        const ledgeLeft = 10 * T, ledgeRight = 13 * T;
+        const nearLedge = miner.x + miner.w >= ledgeLeft - T * 2 && miner.x <= ledgeRight;
+        keys["ArrowUp"] = nearLedge;
+      } else {
+        keys["ArrowUp"] = false;
+      }
     }
 
     function update() {
@@ -438,27 +474,28 @@
         miner.vx = 0;
       } else {
         miner.vx = 0;
-        if (keys["ArrowLeft"]) { miner.vx = -1.35; miner.facing = -1; }
-        if (keys["ArrowRight"]) { miner.vx = 1.35; miner.facing = 1; }
+        if (keys["ArrowLeft"]) { miner.vx = -1.5; miner.facing = -1; }
+        if (keys["ArrowRight"]) { miner.vx = 1.5; miner.facing = 1; }
         if (miner.vx !== 0 && miner.grounded) miner.walk = (miner.walk + 1) % 14;
 
-        const frontTx = miner.facing === 1
-          ? ((miner.x + miner.w) / T | 0)
-          : ((miner.x - 1) / T | 0);
-        const bodyTy = ((miner.y + 4) / T) | 0;
+        const [ftx, fty] = frontTile();
         if (mineQueued && miner.grounded) {
           mineQueued = false;
-          const gem = gems.find((gm) => !gm.mined && gm.tx === frontTx && gm.ty === bodyTy);
-          if (gem) {
-            miner.mine = 12;
-            miner.vx = 0;
+          if (inForge() && miner.carry.length) {
+            deposit();
+          } else {
+            const gem = gemAt(ftx, fty);
+            if (gem && miner.carry.length < 3) {
+              miner.mine = 12;
+              miner.vx = 0;
+            }
           }
         }
       }
       mineQueued = false;
 
-      miner.vy = Math.min(5, miner.vy + 0.3);
-      if (keys["ArrowUp"] && miner.grounded) { miner.vy = -4.4; miner.grounded = false; }
+      miner.vy = Math.min(5, miner.vy + 0.34);
+      if (keys["ArrowUp"] && miner.grounded) { miner.vy = -4.9; miner.grounded = false; }
 
       miner.x += miner.vx;
       if (miner.vx < 0) {
@@ -468,7 +505,7 @@
         const t = ((miner.x + miner.w) / T) | 0;
         if (tile(t, (miner.y / T) | 0) || tile(t, ((miner.y + miner.h - 1) / T) | 0)) miner.x = t * T - miner.w;
       }
-      miner.x = Math.max(0, Math.min(TW - miner.w, miner.x));
+      miner.x = Math.max(T, Math.min(window.innerWidth - miner.w - T, miner.x));
 
       miner.y += miner.vy;
       if (miner.vy < 0) {
@@ -490,39 +527,46 @@
     }
 
     function breakGem() {
-      const frontTx = miner.facing === 1
-        ? ((miner.x + miner.w) / T | 0)
-        : ((miner.x - 1) / T | 0);
-      const bodyTy = ((miner.y + 4) / T) | 0;
-      const gem = gems.find((gm) => !gm.mined && gm.tx === frontTx && gm.ty === bodyTy);
-      if (!gem) return;
-      gem.mined = true;
+      const [ftx, fty] = frontTile();
+      const gem = gemAt(ftx, fty);
+      if (!gem || miner.carry.length >= 3) return;
+      gem.state = "carried";
+      miner.carry.push(gem.tier);
       gemsMined += 1;
-      coins += TIERS[gem.tier].coins;
       const px = gem.tx * T + 4, py = gem.ty * T + 4;
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 8; i++) {
         particles.push({
           x: px, y: py,
-          vx: (Math.random() - 0.5) * 2.4,
-          vy: -Math.random() * 2.6 - 0.6,
-          life: 26 + (Math.random() * 14 | 0),
+          vx: (Math.random() - 0.5) * 2,
+          vy: -Math.random() * 2.4 - 0.5,
+          life: 24 + (Math.random() * 12 | 0),
           color: i % 2 ? TIERS[gem.tier].hi : TIERS[gem.tier].color,
           gold: false,
         });
       }
-      for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        gem.state = "done";
+        respawnWall();
+      }, 600);
+    }
+
+    function deposit() {
+      let total = 0;
+      for (const tier of miner.carry) total += TIERS[tier].coins;
+      coins += total;
+      miner.carry = [];
+      const px = forgeX + T * 2, py = (floorRow - 2) * T;
+      for (let i = 0; i < 6 + total; i++) {
         particles.push({
-          x: px, y: py - 2,
-          vx: (Math.random() - 0.5) * 1.4,
-          vy: -2.8 - Math.random(),
-          life: 30,
+          x: px + (Math.random() - 0.5) * 10, y: py,
+          vx: (Math.random() - 0.5) * 2.2,
+          vy: -2.6 - Math.random() * 2,
+          life: 30 + (Math.random() * 14 | 0),
           color: "#f5c542",
           gold: true,
         });
       }
-      floats.push({ x: px, y: py - 4, text: "+" + TIERS[gem.tier].coins, life: 40 });
-      setTile(gem.tx, gem.ty, 0);
-      setTimeout(respawnGem, 5000);
+      floats.push({ x: px, y: py - 6, text: "+" + total, life: 44 });
     }
 
     function px(x, y, w, h, color) {
@@ -548,34 +592,42 @@
         else px(1, 4, 4, 1, "#c9c9d6");
         px(1, 0, 1, 1, "#8a5a2b");
       } else {
-        px(0, 4, 1, 4, "#4c1d95");
+        px(0, 4, 1, 4, "#3b2a63");
       }
 
-      px(1, 0, 6, 2, "#e8dcc8");
-      px(0, 2, 8, 1, "#d8c8a8");
+      px(1, 0, 6, 2, "#c9c2d6");
+      px(0, 2, 8, 1, "#9c94b0");
       px(5, 1, 2, 2, "#ffd54a");
       px(7, 1, 1, 1, "#fff3c4");
       px(1, 3, 6, 2, "#e8b98a");
-      px(5, 3, 1, 1, "#241a33");
-      px(1, 5, 6, 4, "#6d28d9");
-      px(2, 5, 1, 4, "#4c1d95");
-      px(1, 7, 6, 1, "#3b1d33");
+      px(5, 3, 1, 1, "#1d1230");
+      px(1, 5, 6, 4, "#5b3f9e");
+      px(2, 5, 1, 4, "#3b2a63");
+      px(1, 7, 6, 1, "#241640");
       const leg = m.grounded && m.vx !== 0 ? (m.walk > 6 ? 0 : 1) : 0;
-      px(1, 9, 2, 2 + leg, "#7c3aed");
-      px(4, 9, 2, 3 - leg, "#7c3aed");
-      px(1, 11, 2, 1, "#241a33");
-      px(4, 11, 2, 1, "#241a33");
+      px(1, 9, 2, 2 + leg, "#4a2f85");
+      px(4, 9, 2, 3 - leg, "#4a2f85");
+      px(1, 11, 2, 1, "#1d1230");
+      px(4, 11, 2, 1, "#1d1230");
       g.restore();
 
+      for (let i = 0; i < m.carry.length; i++) {
+        const tier = TIERS[m.carry[i]];
+        const gy = m.y - 8 - i * 5;
+        px(m.x + 1, gy, 3, 2, tier.color);
+        px(m.x + 2, gy - 1, 1, 1, tier.hi);
+      }
+
       const lamX = m.x + (m.facing === 1 ? 9 : -2);
-      const lamp = g.createRadialGradient(lamX, m.y + 2, 1, lamX, m.y + 2, 22);
+      const lamp = g.createRadialGradient(lamX, m.y + 2, 1, lamX, m.y + 2, 24);
       lamp.addColorStop(0, "rgba(255, 214, 90, 0.20)");
       lamp.addColorStop(1, "rgba(255, 214, 90, 0)");
       g.fillStyle = lamp;
-      g.fillRect(lamX - 22, m.y - 20, 44, 44);
+      g.fillRect(lamX - 24, m.y - 22, 48, 48);
     }
 
     function drawGem(gm) {
+      if (gm.state !== "wall") return;
       const tx = gm.tx * T, ty = gm.ty * T;
       const tier = TIERS[gm.tier];
       const tw = frame % 24 < 3;
@@ -585,15 +637,33 @@
       px(tx + 3, ty + 2, 1, 1, tw ? tier.hi : "#f5f0ff");
     }
 
-    function draw() {
-      const bg = g.createLinearGradient(0, 0, 0, TH);
-      bg.addColorStop(0, "#241a3d");
-      bg.addColorStop(1, "#160e26");
+    function drawForge() {
+      const fx = forgeX, fy = (floorRow - 2) * T;
+      for (let i = 0; i < 3; i++) {
+        px(fx + i * T, fy, T, T, "#3a2c55");
+        px(fx + i * T, fy, T, 1, "#55406b");
+        px(fx + i * T, fy + T - 1, T, 1, "#241640");
+      }
+      const fire = frame % 16 < 8;
+      px(fx + T, fy - 4, 8, 4, "#6d28d9");
+      px(fx + T + 2, fy - (fire ? 7 : 5), 4, fire ? 4 : 2, "#a78bfa");
+      px(fx + T + 3, fy - 8, 2, 2, "#ede9fe");
+      const chestX = fx + T * 4;
+      px(chestX, fy + 2, T, T - 2, "#8a5a2b");
+      px(chestX, fy + 2, T, 2, "#a5713f");
+      px(chestX + 3, fy + 5, 2, 2, "#f5c542");
+    }
+
+    function drawWorld() {
+      const w = window.innerWidth, h = window.innerHeight;
+      const bg = g.createLinearGradient(0, 0, 0, h);
+      bg.addColorStop(0, "#221438");
+      bg.addColorStop(1, "#150d26");
       g.fillStyle = bg;
-      g.fillRect(0, 0, TW, TH);
-      g.fillStyle = "rgba(255,255,255,0.03)";
-      for (let i = 0; i < 46; i++) {
-        const sx = (i * 61) % TW, sy = (i * 37) % TH;
+      g.fillRect(0, 0, w, h);
+      g.fillStyle = "rgba(255,255,255,0.035)";
+      for (let i = 0; i < 60; i++) {
+        const sx = (i * 71) % w, sy = (i * 43) % (h * 0.6);
         g.fillRect(sx, sy, 1, 1);
       }
 
@@ -608,7 +678,8 @@
         }
       }
 
-      for (const gm of gems) if (!gm.mined) drawGem(gm);
+      drawForge();
+      for (const gm of gems) drawGem(gm);
 
       for (const p of particles) {
         g.globalAlpha = Math.max(0, p.life / 30);
@@ -623,13 +694,17 @@
 
       drawMiner();
 
-      g.font = "6px ui-monospace, Menlo, monospace";
+      g.font = "7px ui-monospace, Menlo, monospace";
       g.textBaseline = "top";
-      g.fillStyle = "rgba(255,255,255,0.75)";
-      g.fillText("gems " + gemsMined + " · coins " + coins, 4, 4);
+      g.fillStyle = "rgba(237, 233, 254, 0.8)";
+      g.fillText("gems " + gemsMined + " · coins " + coins, 8, 8);
+      if (miner.carry.length) {
+        g.fillStyle = "rgba(196, 181, 253, 0.75)";
+        g.fillText("haul " + miner.carry.length + "/3", 8, 18);
+      }
 
       for (const f of floats) {
-        g.globalAlpha = Math.max(0, f.life / 40);
+        g.globalAlpha = Math.max(0, f.life / 44);
         g.fillStyle = "#f5c542";
         g.fillText(f.text, f.x, f.y);
         g.globalAlpha = 1;
@@ -639,7 +714,7 @@
     function loop() {
       autopilot();
       update();
-      draw();
+      drawWorld();
       frame += 1;
       for (const p of particles) {
         p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= 1;
@@ -650,7 +725,8 @@
       requestAnimationFrame(loop);
     }
 
-    buildCave();
+    layout();
+    window.addEventListener("resize", layout);
     requestAnimationFrame(loop);
   </script>
 </body>

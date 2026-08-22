@@ -24,18 +24,11 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { min-height: 100%; }
     body {
-      background: #ffffff;
+      background: hsl(38 44% 97%);
       color: hsl(30 22% 12%);
       font-family: Inter, system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
-    }
-    canvas#world {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
+      overflow: hidden;
     }
     .banner {
       position: fixed;
@@ -47,26 +40,26 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: hsl(30 10% 50%);
-      background: rgba(255, 255, 255, 0.85);
+      background: hsl(38 44% 97% / 0.9);
       border: 1px solid hsl(38 22% 86%);
       border-radius: 999px;
       padding: 6px 12px;
-      z-index: 3;
+      z-index: 4;
       white-space: nowrap;
     }
     .banner a { color: hsl(262 70% 45%); text-decoration: none; }
+
     main {
-      position: relative;
-      z-index: 1;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: var(--cave, 320px);
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 56px 20px calc(88px + clamp(280px, 36vh, 380px) + 20px);
-      pointer-events: none;
-    }
-    @media (min-width: 640px) {
-      main { padding: 64px 24px calc(88px + clamp(300px, 38vh, 400px) + 20px); }
+      padding: 56px 20px 12px;
+      z-index: 1;
     }
     .copy {
       width: 100%;
@@ -74,37 +67,26 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      pointer-events: auto;
     }
     h1 {
       font-family: Fraunces, Georgia, serif;
       font-weight: 500;
-      font-size: clamp(28px, 5vw, 44px);
+      font-size: clamp(27px, 4.6vw, 42px);
       line-height: 1.08;
       letter-spacing: -0.025em;
       text-align: center;
       margin-bottom: 10px;
     }
-    .accent {
-      color: hsl(262 70% 38%);
-      font-style: italic;
-      padding-right: 0.3em;
-    }
+    .accent { color: hsl(262 70% 38%); font-style: italic; padding-right: 0.3em; }
     .sub {
       font-size: 15px;
-      line-height: 1.55;
+      line-height: 1.5;
       color: hsl(30 10% 36%);
       text-align: center;
       max-width: 340px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
-    form {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
-      max-width: 380px;
-    }
+    form { display: flex; align-items: center; gap: 8px; width: 100%; max-width: 380px; }
     input[type="email"] {
       flex: 1;
       height: 46px;
@@ -137,7 +119,7 @@
     .err { display: none; font-size: 12px; color: hsl(0 70% 45%); margin-top: 10px; }
     .err.show { display: block; }
     .term {
-      margin-top: 20px;
+      margin-top: 18px;
       font-family: ui-monospace, Menlo, monospace;
       font-size: 13px;
       background: hsl(30 22% 10%);
@@ -159,49 +141,8 @@
       text-transform: uppercase;
       opacity: 0.45;
     }
-    .tiers {
-      margin-top: 12px;
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: hsl(30 10% 44%);
-    }
-    .pad {
-      display: none;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 16px;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    @media (hover: none) {
-      .pad {
-        display: flex;
-        position: fixed;
-        bottom: 10px;
-        left: 0;
-        right: 0;
-        z-index: 2;
-        margin: 0;
-      }
-    }
-    .pad button {
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 15px;
-      width: 58px;
-      height: 44px;
-      border-radius: 12px;
-      border: 1px solid hsl(38 22% 82%);
-      background: rgba(255, 255, 255, 0.8);
-      color: hsl(30 22% 20%);
-      cursor: pointer;
-      touch-action: manipulation;
-      backdrop-filter: blur(3px);
-    }
-    .pad button:active { background: hsl(262 70% 45%); color: #faf7f0; }
     footer {
-      margin-top: 18px;
+      margin-top: 16px;
       display: flex;
       gap: 18px;
       font-family: ui-monospace, Menlo, monospace;
@@ -209,10 +150,26 @@
     }
     footer a { color: hsl(30 10% 44%); text-decoration: none; }
     footer a:hover { color: hsl(262 70% 45%); }
+
+    /* The cave is pinned to the bottom and is the only clickable game surface. */
+    .stage {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: var(--cave, 320px);
+      z-index: 2;
+      touch-action: none;
+    }
+    canvas#world { display: block; width: 100%; height: 100%; cursor: pointer; }
+    @media (max-width: 560px) {
+      .sub { margin-bottom: 14px; }
+      .term { margin-top: 14px; font-size: 12px; padding: 11px 14px; }
+      footer { margin-top: 12px; gap: 14px; }
+    }
   </style>
 </head>
 <body>
-  <canvas id="world" aria-hidden="true"></canvas>
   <div class="banner">preview · <a href="/">live site</a></div>
   <main>
     <div class="copy">
@@ -229,13 +186,6 @@
         <span>curl -fsSL iolit.dev/install | sh</span>
         <span class="hint" id="copied">copy</span>
       </button>
-      <p class="tiers">pulse · trace · raw</p>
-      <div class="pad">
-        <button id="b-l" aria-label="left">◀</button>
-        <button id="b-j" aria-label="jump">▲</button>
-        <button id="b-m" aria-label="mine">⛏</button>
-        <button id="b-r" aria-label="right">▶</button>
-      </div>
       <footer>
         <a href="/">live</a>
         <a href="/privacy">privacy</a>
@@ -244,6 +194,11 @@
       </footer>
     </div>
   </main>
+
+  <div class="stage" id="stage">
+    <canvas id="world"></canvas>
+  </div>
+
   <script>
     const INSTALL = "curl -fsSL iolit.dev/install | sh";
     document.getElementById("copy").addEventListener("click", async () => {
@@ -270,434 +225,900 @@
       }
     });
 
-    // Grid digging engine, light cave cutaway pinned to the bottom.
-    const T = 16;
-    const S = 2.5;
-    const O = { SPACE: 0, DIRT: 1, ROCK: 2, FORGE: 3 };
+    // ---- Cave miner -------------------------------------------------------
+    // Ground is solid until dug, so the miner is always in a tunnel.
+    // Ore is a tile, not an object, so it cannot desync from the grid.
+
+    const T = 16;                                   // world px per tile
+    const HEAD = 16;                                // sky headroom above the ground line
+    const CAP = 3;                                  // gems carried at once
+    const SKY = 0, TUNNEL = 1, DIRT = 2, ROCK = 3, BEDROCK = 4, FORGE = 5, ORE = 6;
+    const SOLID = { [DIRT]: 1, [ROCK]: 1, [ORE]: 1 };
+    const HITS = { [DIRT]: 2, [ROCK]: 4, [ORE]: 3 };  // pick swings to break a tile
+    const MAX_HP = 3;
+    const SNAKE_HP = 3;
+    const SNAKE_STEP = 22;                            // frames per move in open tunnel
+    const SNAKE_SOIL = 40;                            // frames per move while burrowing
+    const SNAKE_BITE = 55;                            // frames between bites
+    const HURT_LOCK = 55;                             // invulnerable frames after a bite
+    const MAX_SNAKES = 3;
+    const WAKE = 5;                                   // tiles: how close wakes a lair
+    const EMERGE = 24;                                // frames spent surfacing
+    const SWING = 14;                                 // frames per swing
+    const IMPACT = 9;                                 // frame in the swing that lands
+    const STEP_FRAMES = 9;                            // frames to cross one tile
+
     const TIERS = {
-      pulse: { color: "#d9ccfd", mid: "#b39df7", dark: "#7c5cf0", hi: "#ffffff", coins: 1 },
-      trace: { color: "#a78bfa", mid: "#8b5cf6", dark: "#5b21b6", hi: "#ffffff", coins: 4 },
-      raw: { color: "#7c3aed", mid: "#5b21b6", dark: "#3b0a63", hi: "#ffffff", coins: 12 },
+      pulse: { name: "pulse", lo: "#a78bfa", mid: "#c4b5fd", hi: "#ede9fe", gold: 1 },
+      trace: { name: "trace", lo: "#7c3aed", mid: "#9f7aea", hi: "#ddd6fe", gold: 3 },
+      raw:   { name: "raw",   lo: "#5b21b6", mid: "#7c3aed", hi: "#c4b5fd", gold: 8 },
     };
-    const ROCK_A = "#e3ddcd", ROCK_HI = "#f2eee2", ROCK_LO = "#c9c0ac", ROCK_LINE = "#a99f8a";
-    const DIRT_A = "#ece6d6", DIRT_B = "#e6dfcc", DIRT_HI = "#f7f3e9", DIRT_LO = "#d2c8b0";
 
     const cv = document.getElementById("world");
+    const stage = document.getElementById("stage");
     const g = cv.getContext("2d");
-    g.imageSmoothingEnabled = false;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    let W = 0, H = 0;
+    let W = 0, H = 0, S = 2.5, unit = 2.5;          // unit = device px per world px
     let grid = new Uint8Array(0);
-    let gems = [];
-    let particles = [];
-    let floats = [];
-    let smoke = [];
-    let coins = 0, gemsMined = 0;
+    let tier = new Uint8Array(0);                   // ore tier per tile
+    let seedv = 1;
+    let cam = 0;
     let frame = 0;
-    let forge = { tx: 0, ty: 0 };
     let shake = 0;
-    let caveTop = 0;
+    let mined = 0, gold = 0;
+    let particles = [], floats = [];
+    let forge = { tx: 3, ty: 0 };
+    let stuck = 0;
+    let lamp = 0;
+    let snakes = [];
+    let lairs = [];
+    let hp = MAX_HP;
+    let hpShown = MAX_HP;                           // trails hp so the bar drains
+    let hurt = 0;                                   // invulnerable frames left
+    let downed = 0;                                 // frames left before the reset
+    let flash = 0;                                  // reset wipe
+    let tipLeft = 620;                              // frames the hint stays up
 
     const miner = {
-      tx: 1, ty: 1,
-      fx: 0, fy: 0,
+      tx: 5, ty: 0,
+      px: 0, py: 0,                                 // render position, world px
       face: 1,
-      walk: 0,
-      moving: false,
-      mineAnim: 0,
       carry: [],
+      step: null,                                   // { tx, ty, t }
+      dig: null,                                    // { tx, ty, t, hits, need }
+      bob: 0,
+      cool: 0,                                      // recovery frames after a swing
     };
-    let inputDir = -1;
+
     let path = [];
+    let manual = -1;                                // queued player direction
+    let digMemo = { key: -1, hits: 0 };             // progress kept when you turn away
     let lastInput = -1e9;
-    let pathTimer = 0;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const DX = [0, 1, 0, -1], DY = [-1, 0, 1, 0];
     const now = () => performance.now();
 
-    function at(tx, ty) {
-      if (tx < 0 || tx >= W || ty < 0 || ty >= H) return O.ROCK;
-      return grid[ty * W + tx];
+    function rnd() {                                // mulberry32
+      seedv |= 0; seedv = (seedv + 0x6D2B79F5) | 0;
+      let t = Math.imul(seedv ^ (seedv >>> 15), 1 | seedv);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     }
-    function setAt(tx, ty, v) {
-      if (tx >= 0 && tx < W && ty >= 0 && ty < H) grid[ty * W + tx] = v;
+    const ri = (n) => (rnd() * n) | 0;
+    const at = (tx, ty) => (tx < 0 || tx >= W || ty < 0 || ty >= H) ? BEDROCK : grid[ty * W + tx];
+    const setAt = (tx, ty, v) => { if (tx >= 0 && tx < W && ty >= 0 && ty < H) grid[ty * W + tx] = v; };
+
+    // Deeper ore pays more.
+    function tierFor(ty) {
+      const d = (ty - 1) / Math.max(1, H - 2);
+      return d > 0.6 ? 3 : d > 0.28 ? 2 : 1;
     }
+    const tierOf = (i) => i === 3 ? TIERS.raw : i === 2 ? TIERS.trace : TIERS.pulse;
 
     function layout() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = window.innerWidth / S;
-      const h = window.innerHeight / S;
-      cv.width = Math.floor(window.innerWidth * dpr);
-      cv.height = Math.floor(window.innerHeight * dpr);
+      const vw = window.innerWidth, vh = window.innerHeight;
+      S = vw < 560 ? 2 : vw < 1000 ? 2.5 : 3;
+
+      const want = Math.max(240, Math.min(vh * 0.46, 420));
+      const rows = Math.max(6, Math.round(want / (T * S)));
+      const cols = Math.max(30, Math.ceil(vw / (T * S)) + 14);
+      const caveH = (rows * T + HEAD) * S;
+
+      document.documentElement.style.setProperty("--cave", caveH + "px");
+      cv.style.height = caveH + "px";
+      cv.width = Math.floor(vw * dpr);
+      cv.height = Math.floor(caveH * dpr);
       g.setTransform(dpr * S, 0, 0, dpr * S, 0, 0);
+      g.imageSmoothingEnabled = false;
+      unit = dpr * S;
 
-      const rows = window.innerHeight < 700 ? 8 : 9;
-      W = Math.max(26, Math.ceil(w / T) + 1);
-      H = rows;
+      if (cols !== W || rows !== H) {
+        W = cols; H = rows;
+        generate();
+      }
+    }
+
+    function generate() {
       grid = new Uint8Array(W * H);
-      caveTop = h - H * T;
-
-      for (let tx = 0; tx < W; tx++) {
-        setAt(tx, H - 2, O.ROCK);
-        setAt(tx, H - 1, O.ROCK);
-      }
+      tier = new Uint8Array(W * H);
       for (let ty = 0; ty < H; ty++) {
-        setAt(0, ty, O.ROCK);
-        setAt(W - 1, ty, O.ROCK);
-      }
-
-      const dirtL = Math.floor(W * 0.42);
-      const dirtR = Math.floor(W * 0.58);
-      for (let tx = dirtL; tx <= dirtR; tx++) setAt(tx, H - 3, O.DIRT);
-      for (let tx = dirtL + 1; tx <= dirtR - 1; tx++) setAt(tx, H - 4, O.DIRT);
-      for (let tx = dirtL + 2; tx <= dirtR - 2; tx++) setAt(tx, H - 5, O.DIRT);
-
-      forge = { tx: W - 4, ty: H - 3 };
-      setAt(forge.tx, forge.ty, O.FORGE);
-      setAt(forge.tx - 1, forge.ty, O.ROCK);
-
-      gems = [];
-      const boulderSpots = [[0.14, "pulse"], [0.28, "trace"], [0.36, "trace"], [0.68, "pulse"], [0.8, "raw"]];
-      for (const [fx, tier] of boulderSpots) {
-        const tx = Math.floor(W * fx);
-        if (tx > 1 && tx < W - 4) {
-          setAt(tx, H - 3, O.ROCK);
-          spawnGem(tx, H - 3, tier, "rock");
+        for (let tx = 0; tx < W; tx++) {
+          let v = DIRT;
+          if (ty === 0) v = SKY;
+          else if (ty === H - 1 || tx === 0 || tx === W - 1) v = BEDROCK;
+          setAt(tx, ty, v);
         }
       }
-      spawnGem(dirtL + 2, H - 4, "trace", "dirt");
-      spawnGem(dirtR - 2, H - 5, "raw", "dirt");
-
-      miner.tx = 2;
-      miner.ty = H - 3;
-      miner.fx = miner.tx * T;
-      miner.fy = miner.ty * T;
-      miner.carry = [];
-      miner.moving = false;
-      particles = [];
-      floats = [];
-      smoke = [];
-      path = [];
-    }
-
-    function spawnGem(tx, ty, tier, host) {
-      gems.push({ tx, ty, tier, state: "inrock", host, crack: 0, spark: 40 + (Math.random() * 60 | 0) });
-    }
-
-    function touchUser() { lastInput = now(); }
-
-    const DX = [0, 1, 0, -1];
-    const DY = [-1, 0, 1, 0];
-    function setInput(dir) {
-      inputDir = dir;
-      touchUser();
-    }
-    window.addEventListener("keydown", (e) => {
-      const map = { ArrowLeft: 3, ArrowRight: 1, ArrowUp: 0, ArrowDown: 2, " ": -1 };
-      const k = e.key;
-      if (k in map) {
-        e.preventDefault();
-        if (map[k] === -1) mineTap();
-        else setInput(map[k]);
+      // Scatter rock seams.
+      for (let i = 0; i < Math.floor(W * H * 0.05); i++) {
+        const tx = 1 + ri(W - 2), ty = 2 + ri(Math.max(1, H - 3));
+        if (at(tx, ty) === DIRT) setAt(tx, ty, ROCK);
       }
-    });
-    function dirFromFace(f) { return f === -1 ? 3 : 1; }
-    function mineTap() {
-      touchUser();
-      if (miner.mineAnim > 0 || miner.moving) return;
-      const d = dirFromFace(miner.face);
-      const ftx = miner.tx + DX[d];
-      const fty = miner.ty + DY[d];
-      const gm = gems.find((x) => x.state === "inrock" && x.tx === ftx && x.ty === fty);
-      if (at(ftx, fty) === O.DIRT || gm) {
-        miner.mineAnim = 14;
-        path = [];
+      forge = { tx: 3, ty: 0 };
+      setAt(forge.tx, forge.ty, FORGE);
+
+      miner.tx = 6; miner.ty = 0;
+      miner.px = miner.tx * T; miner.py = miner.ty * T;
+      miner.carry = []; miner.step = null; miner.dig = null;
+      path = []; particles = []; floats = []; cam = 0; stuck = 0;
+      snakes = []; lairs = []; hp = MAX_HP; hurt = 0; downed = 0;
+      seedOre(7);
+    }
+
+    // Lairs are hidden in soil. Dig near one and it wakes.
+    // Row 2 and below, so the surface stays safe.
+    function wakeLairs() {
+      if (snakes.length >= MAX_SNAKES) return;
+      for (let i = lairs.length - 1; i >= 0; i--) {
+        const l = lairs[i];
+        if (Math.abs(l.tx - miner.tx) + Math.abs(l.ty - miner.ty) > WAKE) continue;
+        lairs.splice(i, 1);
+        spawnSnake(l.tx, l.ty);                     // it burrows out, the soil stays
+        if (snakes.length >= MAX_SNAKES) return;
       }
     }
 
-    function hold(id, dir) {
-      const el = document.getElementById(id);
-      el.addEventListener("pointerdown", (e) => {
-        e.preventDefault();
-        if (dir === "m") mineTap();
-        else setInput(dir);
-      });
+    // Veins of 2 to 4 tiles.
+    function seedOre(veins) {
+      let placed = 0;
+      for (let n = 0; n < veins * 12 && placed < veins; n++) {
+        const tx = 2 + ri(Math.max(1, W - 4));
+        const ty = 1 + ri(Math.max(1, H - 2));
+        if (at(tx, ty) !== DIRT && at(tx, ty) !== ROCK) continue;
+        if (Math.abs(tx - miner.tx) < 3 && Math.abs(ty - miner.ty) < 2) continue;
+        let cx = tx, cy = ty;
+        const len = 2 + ri(3);
+        for (let k = 0; k < len; k++) {
+          if (at(cx, cy) === DIRT || at(cx, cy) === ROCK) {
+            setAt(cx, cy, ORE);
+            tier[cy * W + cx] = tierFor(cy);
+          }
+          const d = ri(4);
+          cx += DX[d]; cy += DY[d];
+          if (cy < 1) cy = 1;
+        }
+        // Nest near the ore, so risk sits where you dig.
+        if (rnd() < 0.6) lairNear(tx, ty);
+        placed++;
+      }
     }
-    hold("b-l", 3); hold("b-r", 1); hold("b-j", 0); hold("b-m", "m");
 
-    function gemAtTile(tx, ty) {
-      return gems.find((gm) => (gm.state === "inrock" || gm.state === "dirt") && gm.tx === tx && gm.ty === ty);
+    function lairNear(tx, ty) {
+      if (lairs.length >= 6) lairs.shift();
+      const away = (2 + ri(3)) * (ri(2) ? 1 : -1);
+      const lx = Math.max(2, Math.min(W - 3, tx + away));
+      const ly = Math.max(2, Math.min(H - 2, ty + ri(3) - 1));
+      if (Math.abs(lx - miner.tx) + Math.abs(ly - miner.ty) < WAKE + 2) return;
+      lairs.push({ tx: lx, ty: ly });
     }
 
-    function passable(tx, ty) {
-      const v = at(tx, ty);
-      return v === O.SPACE || v === O.DIRT || v === O.FORGE;
+    // Refill tunnels off screen, so the cave never empties or visibly resets.
+    function collapseOffscreen() {
+      const w = window.innerWidth / S;
+      const x0 = Math.floor(cam / T) - 2, x1 = Math.ceil((cam + w) / T) + 2;
+      for (let ty = 1; ty < H - 1; ty++) {
+        for (let tx = 1; tx < W - 1; tx++) {
+          if (tx >= x0 && tx <= x1) continue;
+          if (at(tx, ty) !== TUNNEL) continue;
+          setAt(tx, ty, hash(tx, ty + frame) % 9 === 0 ? ROCK : DIRT);
+        }
+      }
     }
 
-    function bfs(fromTx, fromTy, goalFn) {
-      const key = (x, y) => y * W + x;
-      const prev = new Int32Array(W * H).fill(-1);
-      const seen = new Uint8Array(W * H);
-      const queue = [key(fromTx, fromTy)];
-      seen[key(fromTx, fromTy)] = 1;
-      let head = 0;
+    function oreLeft() {
+      let n = 0;
+      for (let i = 0; i < grid.length; i++) if (grid[i] === ORE) n++;
+      return n;
+    }
+    function solidLeft() {
+      let n = 0;
+      for (let i = 0; i < grid.length; i++) if (SOLID[grid[i]]) n++;
+      return n;
+    }
+
+    // ---- routing ----------------------------------------------------------
+    // Tunnels are cheap, so the miner reuses its own shafts going home.
+    function cost(v) {
+      if (v === SKY || v === TUNNEL || v === FORGE) return 1;
+      if (v === DIRT) return 5;
+      if (v === ROCK) return 12;
+      if (v === ORE) return 8;
+      return -1;
+    }
+
+    function route(sx, sy, isGoal) {
+      const n = W * H;
+      const dist = new Int32Array(n).fill(0x3fffffff);
+      const prev = new Int32Array(n).fill(-1);
+      const done = new Uint8Array(n);
+      const start = sy * W + sx;
+      dist[start] = 0;
       let goal = -1;
-      while (head < queue.length && queue.length < W * H) {
-        const cur = queue[head++];
-        const cx = cur % W, cy = (cur / W) | 0;
-        if (goalFn(cx, cy)) { goal = cur; break; }
+      for (;;) {
+        let u = -1, best = 0x3fffffff;
+        for (let i = 0; i < n; i++) if (!done[i] && dist[i] < best) { best = dist[i]; u = i; }
+        if (u < 0) break;
+        done[u] = 1;
+        const ux = u % W, uy = (u / W) | 0;
+        if (isGoal(ux, uy)) { goal = u; break; }
         for (let d = 0; d < 4; d++) {
-          const nx = cx + DX[d], ny = cy + DY[d];
-          const nk = key(nx, ny);
+          const nx = ux + DX[d], ny = uy + DY[d];
           if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
-          if (seen[nk]) continue;
-          if (!passable(nx, ny)) continue;
-          seen[nk] = 1;
-          prev[nk] = cur;
-          queue.push(nk);
+          const c = cost(at(nx, ny));
+          if (c < 0) continue;
+          const k = ny * W + nx;
+          if (done[k]) continue;
+          const nd = dist[u] + c;
+          if (nd < dist[k]) { dist[k] = nd; prev[k] = u; }
         }
       }
       if (goal < 0) return null;
       const out = [];
-      let cur = goal;
-      while (cur !== -1 && cur !== key(fromTx, fromTy)) {
-        out.push([cur % W, (cur / W) | 0]);
-        cur = prev[cur];
-      }
+      for (let cur = goal; cur !== -1 && cur !== start; cur = prev[cur]) out.push([cur % W, (cur / W) | 0]);
       out.reverse();
       return out;
     }
 
-    function autopilot() {
-      if (reduce) return;
-      if (now() - lastInput < 4200) return;
-      if (miner.moving || miner.mineAnim > 0) return;
-
-      const live = gems.filter((gm) => gm.state === "inrock" || gm.state === "dirt");
-
-      if (miner.carry.length >= 3 || (miner.carry.length > 0 && !live.length)) {
-        if (miner.tx === forge.tx && miner.ty === forge.ty) {
-          deposit();
-          return;
-        }
-        if (!path.length || pathTimer <= 0) {
-          path = bfs(miner.tx, miner.ty, (x, y) => x === forge.tx && y === forge.ty) || [];
-          pathTimer = 40;
-        }
-      } else if (live.length) {
-        let best = null, bd = 1e9;
-        for (const gm of live) {
-          const d = Math.abs(gm.tx - miner.tx) + Math.abs(gm.ty - miner.ty);
-          if (d < bd) { bd = d; best = gm; }
-        }
-        if (!best) return;
-
-        const beside = (miner.tx === best.tx - 1 && miner.ty === best.ty)
-          || (miner.tx === best.tx + 1 && miner.ty === best.ty)
-          || (miner.tx === best.tx && (miner.ty === best.ty - 1 || miner.ty === best.ty + 1));
-        if (beside) {
-          miner.face = best.tx > miner.tx ? 1 : best.tx < miner.tx ? -1 : miner.face;
-          path = [];
-          if (best.host === "rock") {
-            if (at(best.tx, best.ty) === O.ROCK) {
-              mineTap();
-              return;
-            }
-          } else {
-            if (best.ty > miner.ty) setInput(2);
-            else if (best.ty < miner.ty) setInput(0);
-            else setInput(miner.face === 1 ? 1 : 3);
-            return;
-          }
-        }
-        if (!path.length || pathTimer <= 0) {
-          const goal = best.host === "rock"
-            ? ((x, y) => (x === best.tx - 1 || x === best.tx + 1) && y === best.ty)
-            : ((x, y) => x === best.tx && y === best.ty);
-          path = bfs(miner.tx, miner.ty, goal) || [];
-          pathTimer = 40;
+    function nearestOre() {
+      let best = null, bd = 1e9;
+      for (let ty = 1; ty < H; ty++) {
+        for (let tx = 1; tx < W - 1; tx++) {
+          if (at(tx, ty) !== ORE) continue;
+          const d = Math.abs(tx - miner.tx) * 1.2 + Math.abs(ty - miner.ty);
+          if (d < bd) { bd = d; best = [tx, ty]; }
         }
       }
-      if (pathTimer > 0) pathTimer -= 1;
+      return best;
     }
 
-    function stepMiner(dir) {
-      const nx = miner.tx + DX[dir];
-      const ny = miner.ty + DY[dir];
+    function replan() {
+      if (miner.carry.length >= CAP) {
+        path = route(miner.tx, miner.ty, (x, y) => x === forge.tx && y === forge.ty) || [];
+        return;
+      }
+      const ore = nearestOre();
+      if (ore) {
+        path = route(miner.tx, miner.ty, (x, y) => x === ore[0] && y === ore[1]) || [];
+        if (path.length) return;
+      }
+      if (miner.carry.length) {
+        path = route(miner.tx, miner.ty, (x, y) => x === forge.tx && y === forge.ty) || [];
+        return;
+      }
+      path = [];
+    }
+
+    // ---- actions ----------------------------------------------------------
+    function beginStep(dir) {
+      const nx = miner.tx + DX[dir], ny = miner.ty + DY[dir];
       const v = at(nx, ny);
-      if (v === O.SPACE || v === O.DIRT || v === O.FORGE) {
-        if (v === O.DIRT) {
-          const gm = gems.find((x) => x.host === "dirt" && x.state === "dirt" && x.tx === nx && x.ty === ny);
-          if (gm && miner.carry.length < 3) collect(gm);
-          setAt(nx, ny, O.SPACE);
-          puff(nx * T + 8, ny * T + 8);
-        }
-        if (v === O.FORGE && miner.carry.length) deposit();
-        miner.tx = nx;
-        miner.ty = ny;
-        miner.moving = true;
-        miner.walk = (miner.walk + 1) % 16;
+      if (v === BEDROCK) return false;
+      if (dir === 1) miner.face = 1;
+      if (dir === 3) miner.face = -1;
+
+      // Snakes take the same action that digs.
+      const s = snakeAt(nx, ny);
+      if (s) {
+        miner.dig = { tx: nx, ty: ny, t: 0, hits: 0, need: 1, foe: s };
         return true;
       }
-      return false;
+      if (SOLID[v]) {
+        if (v === ORE && miner.carry.length >= CAP) return false;
+        const k = ny * W + nx;
+        const kept = digMemo.key === k ? digMemo.hits : 0;
+        miner.dig = { tx: nx, ty: ny, t: 0, hits: kept, need: HITS[v] };
+        return true;
+      }
+      miner.step = { tx: nx, ty: ny, t: 0 };
+      return true;
     }
 
-    function collect(gm) {
-      gm.state = "carried";
-      miner.carry.push(gm.tier);
-      gemsMined += 1;
-      burst(gm.tx * T + 8, gm.ty * T + 8, TIERS[gm.tier]);
-      shake = 4;
-      setTimeout(() => {
-        gm.state = "done";
-        if (!gems.some((x) => x.state === "inrock" || x.state === "dirt")) respawnAll();
-      }, 500);
-    }
-
-    function respawnAll() {
-      const boulderSpots = [[0.14, "pulse"], [0.28, "trace"], [0.36, "trace"], [0.68, "pulse"], [0.8, "raw"]];
-      for (const [fx, tier] of boulderSpots) {
-        const tx = Math.floor(W * fx);
-        if (tx > 1 && tx < W - 4) {
-          setAt(tx, H - 3, O.ROCK);
-          spawnGem(tx, H - 3, tier, "rock");
+    // One swing lands. Chips fly, tile holds.
+    function strike(d) {
+      if (d.foe) return;                            // hitSnake does its own hit spray
+      const v = at(d.tx, d.ty);
+      const fx = d.tx * T + 8 - miner.face * 5, fy = d.ty * T + 8;
+      shake = v === ROCK ? 3 : 2;
+      const col = v === ROCK ? ["#6b655c", "#4a453e"] : ["#6b563f", "#4a3a2a"];
+      for (let i = 0; i < 5; i++) {
+        particles.push({
+          x: fx, y: fy, vx: (rnd() - 0.5) * 2.4 - miner.face * 0.6,
+          vy: -rnd() * 1.8 - 0.3, life: 14 + ri(10), size: 2,
+          color: i % 2 ? col[0] : col[1], glow: false,
+        });
+      }
+      if (v === ORE) {
+        const t = tierOf(tier[d.ty * W + d.tx]);
+        for (let i = 0; i < 4; i++) {
+          particles.push({
+            x: fx, y: fy, vx: (rnd() - 0.5) * 2.2, vy: -rnd() * 2 - 0.4,
+            life: 18 + ri(10), size: 2, color: i % 2 ? t.hi : t.mid, glow: true,
+          });
         }
       }
-      const dirtL = Math.floor(W * 0.42);
-      const dirtR = Math.floor(W * 0.58);
-      spawnGem(dirtL + 2, H - 4, "trace", "dirt");
-      spawnGem(dirtR - 2, H - 5, "raw", "dirt");
-      setAt(dirtL + 2, H - 4, O.DIRT);
-      setAt(dirtR - 2, H - 5, O.DIRT);
+    }
+
+    function finishDig() {
+      const { tx, ty, foe } = miner.dig;
+      const v = at(tx, ty);
+      miner.dig = null;
+      digMemo = { key: -1, hits: 0 };
+      if (foe) {
+        if (foe.hp > 0) hitSnake(foe);
+        miner.cool = 14;                            // recovery, so a fight reads
+        path = [];
+        return;
+      }
+      if (v === ORE) {
+        const t = tierOf(tier[ty * W + tx]);
+        miner.carry.push(t.name);
+        mined += 1;
+        burst(tx * T + 8, ty * T + 8, t);
+        shake = 4;
+      } else {
+        dust(tx * T + 8, ty * T + 8);
+        shake = 2;
+      }
+      setAt(tx, ty, TUNNEL);
+      if (oreLeft() === 0) {
+        if (solidLeft() < W * 2) collapseOffscreen();
+        seedOre(6);
+      }
+      path = [];
+    }
+
+    function arrive() {
+      miner.tx = miner.step.tx; miner.ty = miner.step.ty;
+      miner.step = null;
+      if (at(miner.tx, miner.ty) === FORGE) {
+        deposit();
+        if (hp < MAX_HP) hp = MAX_HP;  // the forge patches you up
+      }
     }
 
     function deposit() {
       if (!miner.carry.length) return;
       let total = 0;
-      for (const tier of miner.carry) total += TIERS[tier].coins;
-      coins += total;
+      for (const name of miner.carry) total += TIERS[name].gold;
+      gold += total;
       miner.carry = [];
-      const px = forge.tx * T + 8, py = forge.ty * T + 8;
-      for (let i = 0; i < 6 + total; i++) {
+      const x = forge.tx * T + 8, y = forge.ty * T + 6;
+      for (let i = 0; i < 10 + total; i++) {
         particles.push({
-          x: px + (Math.random() - 0.5) * 14, y: py,
-          vx: (Math.random() - 0.5) * 2.6,
-          vy: -3 - Math.random() * 2.2,
-          life: 32 + (Math.random() * 16 | 0),
-          color: "#f5c542",
-          gold: true,
-          size: 4,
+          x: x + (rnd() - 0.5) * 12, y,
+          vx: (rnd() - 0.5) * 2.4, vy: -2.4 - rnd() * 2.2,
+          life: 34 + ri(18), size: 3, color: "#ffd76a", glow: true,
         });
       }
-      floats.push({ x: px, y: py - 8, text: "+" + total, life: 46, color: "#e6a817" });
+      floats.push({ x, y: y - 10, text: "+" + total, life: 52, color: "#ffd76a" });
+      shake = 5;
+      path = [];
     }
 
-    function puff(x, y) {
-      for (let i = 0; i < 4; i++) {
+    // ---- cave serpent -----------------------------------------------------
+    // Burrows through soil but not bedrock, and never reaches daylight.
+    // Slower in soil than in tunnel, so you can outrun it.
+    function spawnSnake(tx, ty) {
+      if (snakes.length >= MAX_SNAKES) return;
+      const s = {
+        tx, ty, px: tx * T, py: ty * T, hp: SNAKE_HP, t: 0, bite: 0,
+        face: miner.tx < tx ? -1 : 1, wig: ri(40), emerge: EMERGE, back: [],
+      };
+      // Trail back through past tiles so the body is never a dot.
+      for (let i = 1; i <= 6; i++) s.back.push({ x: (tx + i) * T, y: ty * T });
+      snakes.push(s);
+      floats.push({ x: tx * T + 8, y: ty * T - 6, text: "!", life: 44, color: "#e06a5c" });
+      dust(tx * T + 8, ty * T + 8);
+      shake = 6;
+    }
+
+    // Anywhere but bedrock and daylight.
+    const snakeCan = (tx, ty) => ty >= 1 && ty < H && tx > 0 && tx < W - 1 && at(tx, ty) !== BEDROCK;
+    const buried = (tx, ty) => !!SOLID[at(tx, ty)];
+
+    function updateSnakes() {
+      wakeLairs();
+      for (const s of snakes) {
+        s.wig += 1;
+        if (s.bite > 0) s.bite -= 1;
+        s.px += (s.tx * T - s.px) * 0.22;
+        s.py += (s.ty * T - s.py) * 0.22;
+
+        if (s.emerge > 0) { s.emerge -= 1; continue; }
+        if (downed > 0) continue;
+
+        const dx = miner.tx - s.tx, dy = miner.ty - s.ty;
+        const near = Math.abs(dx) + Math.abs(dy);
+        // Bite check runs every frame so contact lands fast.
+        if (near <= 1) {
+          if (dx !== 0) s.face = dx > 0 ? 1 : -1;
+          if (s.bite === 0 && miner.ty >= 1) { biteMiner(s); s.bite = SNAKE_BITE; }
+          continue;
+        }
+
+        s.t += 1;
+        if (s.t < (buried(s.tx, s.ty) ? SNAKE_SOIL : SNAKE_STEP)) continue;
+        s.t = 0;
+
+        // Close the bigger gap first.
+        const move = (nx, ny) => {
+          if (!snakeCan(nx, ny)) return false;
+          s.back.unshift({ x: s.tx * T, y: s.ty * T });
+          if (s.back.length > 7) s.back.pop();
+          if (nx !== s.tx) s.face = nx > s.tx ? 1 : -1;
+          s.tx = nx; s.ty = ny;
+          if (buried(nx, ny) && frame % 2 === 0) dust(nx * T + 8, ny * T + 8);
+          return true;
+        };
+        const tryX = () => dx !== 0 && move(s.tx + Math.sign(dx), s.ty);
+        const tryY = () => dy !== 0 && move(s.tx, s.ty + Math.sign(dy));
+        if (Math.abs(dx) >= Math.abs(dy)) { if (!tryX()) tryY(); }
+        else if (!tryY()) tryX();
+      }
+      snakes = snakes.filter((s) => s.hp > 0);
+    }
+
+    function biteMiner(s) {
+      if (hurt > 0 || downed > 0) return;
+      hp -= 1;
+      hurt = HURT_LOCK;
+      shake = 7;
+      floats.push({ x: miner.px + 8, y: miner.py - 6, text: "-1", life: 44, color: "#e06a5c" });
+      for (let i = 0; i < 8; i++) {
         particles.push({
-          x, y,
-          vx: (Math.random() - 0.5) * 1.6,
-          vy: -Math.random() * 1.4 - 0.3,
-          life: 16 + (Math.random() * 8 | 0),
-          color: i % 2 ? DIRT_HI : DIRT_LO,
-          gold: false,
-          size: 2,
+          x: miner.px + 8, y: miner.py + 8, vx: (rnd() - 0.5) * 2.6, vy: -rnd() * 2 - 0.4,
+          life: 20 + ri(10), size: 2, color: i % 2 ? "#e06a5c" : "#8c3a30", glow: false,
+        });
+      }
+      // Knock back if there is room.
+      const bx = miner.tx - Math.sign(s.tx - miner.tx);
+      if (bx !== miner.tx && !SOLID[at(bx, miner.ty)] && at(bx, miner.ty) !== BEDROCK) {
+        miner.tx = bx; miner.step = null; miner.dig = null;
+      }
+      if (hp <= 0) goDown();
+    }
+
+    function hitSnake(s) {
+      s.hp -= 1;
+      shake = 4;
+      for (let i = 0; i < 9; i++) {
+        particles.push({
+          x: s.px + 8, y: s.py + 8, vx: (rnd() - 0.5) * 3, vy: -rnd() * 2.4 - 0.4,
+          life: 18 + ri(12), size: 2, color: i % 2 ? "#8fbf4a" : "#4a6b28", glow: false,
+        });
+      }
+      if (s.hp <= 0) {
+        floats.push({ x: s.px + 8, y: s.py - 4, text: "+2", life: 46, color: "#ffd76a" });
+        gold += 2;
+      }
+    }
+
+    // Death wipes the run. Flash and fresh cave, no blocking screen.
+    function goDown() {
+      downed = 70;
+      miner.carry = [];
+      miner.step = null;
+      miner.dig = null;
+      path = [];
+    }
+
+    function revive() {
+      gold = 0;
+      mined = 0;
+      hpShown = MAX_HP;
+      flash = 26;
+      generate();
+      hurt = HURT_LOCK;
+    }
+
+    function snakeAt(tx, ty) {
+      return snakes.find((s) => s.tx === tx && s.ty === ty);
+    }
+
+    const SNAKE_DARK = "#3d5a1f", SNAKE_MID = "#6f9633", SNAKE_LITE = "#9ac94a";
+
+    // Pick a point dist px back along the path, so segments stay even.
+    function alongBody(s, dist) {
+      const pts = [{ x: s.px, y: s.py }, ...s.back];
+      let acc = 0;
+      for (let i = 1; i < pts.length; i++) {
+        const dx = pts[i].x - pts[i - 1].x, dy = pts[i].y - pts[i - 1].y;
+        const seg = Math.hypot(dx, dy);
+        if (seg <= 0.01) continue;
+        if (acc + seg >= dist) {
+          const k = (dist - acc) / seg;
+          return { x: pts[i - 1].x + dx * k, y: pts[i - 1].y + dy * k };
+        }
+        acc += seg;
+      }
+      return pts[pts.length - 1];
+    }
+
+    // Distance back from head, and thickness there. Overlaps into one body.
+    const SEGS = [[4, 6], [7, 6], [10, 5], [13, 5], [16, 4], [19, 3], [22, 2]];
+
+    function drawSnake(s) {
+      // Tail first so the head sits on top.
+      for (let i = SEGS.length - 1; i >= 0; i--) {
+        const [d, sz] = SEGS[i];
+        const p = alongBody(s, d);
+        const wob = Math.sin(s.wig * 0.16 - i * 0.55) * 1.5;
+        const cx = p.x + 8, cy = p.y + 8 + wob;
+        if (buried(Math.floor(cx / T), Math.floor(cy / T))) {
+          px(cx - sz / 2, cy - sz / 2, sz, sz, "#5a4630");   // bulge under the soil
+        } else {
+          px(cx - sz / 2, cy - sz / 2, sz, sz, i % 2 ? SNAKE_MID : SNAKE_DARK);
+          if (sz > 3) px(cx - sz / 2, cy - sz / 2, sz, 1, SNAKE_LITE);
+        }
+      }
+
+      const hx = Math.round(s.px), hy = Math.round(s.py);
+      const hw = Math.round(Math.sin(s.wig * 0.16 + 0.75) * 1.6);
+      const hidden = buried(Math.floor((s.px + 8) / T), Math.floor((s.py + 8) / T));
+
+      if (hidden) {
+        // Buried: only a mound of earth shows.
+        px(hx + 3, hy + 5 + hw, 10, 5, "#5a4630");
+        px(hx + 4, hy + 4 + hw, 8, 2, "#6b563f");
+        px(hx + 6, hy + 3 + hw, 4, 1, "#7d6549");
+        return;
+      }
+
+      g.save();
+      g.translate(hx + 8, hy + 8 + hw);
+      if (s.face === 1) g.scale(-1, 1);
+      px(-7, -3, 8, 6, SNAKE_MID);                  // skull
+      px(-9, -2, 3, 4, SNAKE_MID);                  // snout
+      px(-7, -4, 6, 1, SNAKE_LITE);                 // brow
+      px(-6, -3, 5, 2, SNAKE_LITE);
+      px(-4, -1, 2, 2, "#120c05");                  // eye
+      px(-8, 2, 8, 1, SNAKE_DARK);                  // jaw
+      if (s.wig % 46 < 10) {                        // tongue flick
+        px(-12, 0, 3, 1, "#d94f45");
+        px(-13, -1, 1, 1, "#d94f45");
+        px(-13, 1, 1, 1, "#d94f45");
+      }
+      g.restore();
+
+      if (s.hp < SNAKE_HP) {
+        for (let i = 0; i < SNAKE_HP; i++) {
+          px(hx + 3 + i * 4, hy - 2, 3, 2, i < s.hp ? SNAKE_LITE : "rgba(0, 0, 0, 0.4)");
+        }
+      }
+    }
+
+    function dust(x, y) {
+      for (let i = 0; i < 5; i++) {
+        particles.push({
+          x, y, vx: (rnd() - 0.5) * 1.8, vy: -rnd() * 1.5 - 0.2,
+          life: 14 + ri(10), size: 2, color: i % 2 ? "#6b563f" : "#4a3a2a", glow: false,
         });
       }
     }
-    function burst(x, y, tier) {
-      for (let i = 0; i < 12; i++) {
+    function burst(x, y, t) {
+      for (let i = 0; i < 16; i++) {
         particles.push({
-          x, y,
-          vx: (Math.random() - 0.5) * 2.8,
-          vy: -Math.random() * 3 - 0.6,
-          life: 26 + (Math.random() * 14 | 0),
-          color: i % 2 ? tier.hi : tier.mid,
-          gold: false,
-          size: 3,
+          x, y, vx: (rnd() - 0.5) * 3, vy: -rnd() * 3 - 0.5,
+          life: 26 + ri(16), size: 2 + ri(2), color: i % 3 ? t.mid : t.hi, glow: true,
         });
       }
     }
 
+    // ---- input ------------------------------------------------------------
+    function typing() {
+      const el = document.activeElement;
+      return el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA");
+    }
+    function touched() {
+      lastInput = now();
+      if (tipLeft > 60) tipLeft = 60;
+    }
+    const KEYS = {
+      ArrowUp: 0, ArrowRight: 1, ArrowDown: 2, ArrowLeft: 3,
+      w: 0, d: 1, s: 2, a: 3, W: 0, D: 1, S: 2, A: 3,
+    };
+    window.addEventListener("keydown", (e) => {
+      if (typing() || e.metaKey || e.ctrlKey || e.altKey) return;
+      const dir = KEYS[e.key];
+      if (dir === undefined) return;
+      e.preventDefault();
+      manual = dir;
+      path = [];
+      if (dir === 1) miner.face = 1;                // turn now, even if the move waits
+      if (dir === 3) miner.face = -1;
+      // Turning cancels the dig so keys feel instant. Progress is kept.
+      if (miner.dig && !miner.dig.foe) {
+        const d = miner.dig;
+        if (d.tx !== miner.tx + DX[dir] || d.ty !== miner.ty + DY[dir]) {
+          digMemo = { key: d.ty * W + d.tx, hits: d.hits };
+          miner.dig = null;
+        }
+      }
+      touched();
+    });
+
+    // Hint returns on hover, so the scene never needs pausing.
+    stage.addEventListener("pointerenter", () => { if (tipLeft < 150) tipLeft = 150; });
+
+    stage.addEventListener("pointerdown", (e) => {
+      const r = cv.getBoundingClientRect();
+      const tx = Math.floor(((e.clientX - r.left) / S + cam) / T);
+      const ty = Math.floor(((e.clientY - r.top) / S - HEAD) / T);
+      if (tx < 0 || tx >= W || ty < 0 || ty >= H) return;
+      if (at(tx, ty) === BEDROCK) return;
+      touched();
+      manual = -1;
+      const p = route(miner.tx, miner.ty, (x, y) => x === tx && y === ty);
+      if (p && p.length) path = p;
+    });
+
+    // ---- update -----------------------------------------------------------
     function update() {
-      if (miner.mineAnim > 0) {
-        miner.mineAnim -= 1;
-        if (miner.mineAnim === 8) {
-          const d = dirFromFace(miner.face);
-          const ftx = miner.tx + DX[d];
-          const fty = miner.ty + DY[d];
-          if (at(ftx, fty) === O.DIRT) {
-            const gm = gems.find((x) => x.host === "dirt" && x.state === "dirt" && x.tx === ftx && x.ty === fty);
-            if (gm && miner.carry.length < 3) collect(gm);
-            setAt(ftx, fty, O.SPACE);
-            puff(ftx * T + 8, fty * T + 8);
-            shake = 3;
-            path = [];
-          } else if (at(ftx, fty) === O.ROCK) {
-            const gm = gems.find((x) => x.host === "rock" && x.state === "inrock" && x.tx === ftx && x.ty === fty);
-            if (gm) {
-              gm.crack += 1;
-              shake = 5;
-              puff(ftx * T + 8, fty * T + 6);
-              if (gm.crack >= 2) {
-                setAt(ftx, fty, O.SPACE);
-                collect(gm);
-              }
-            }
-            path = [];
-          }
+      if (hurt > 0) hurt -= 1;
+      updateSnakes();
+      if (downed > 0) {
+        downed -= 1;
+        if (downed === 0) revive();
+        return;
+      }
+
+      if (miner.dig) {
+        const d = miner.dig;
+        d.t += 1;
+        if (d.t === IMPACT) {
+          d.hits += 1;
+          strike(d);
+          if (d.hits >= d.need) { finishDig(); stuck = 0; return; }
         }
-      } else if (!miner.moving) {
-        autopilot();
-        let dir = inputDir;
-        if (path.length) {
-          const [px, py] = path[0];
-          if (px === miner.tx && py === miner.ty) path.shift();
-          if (path.length) {
-            const [nx, ny] = path[0];
-            if (nx > miner.tx) dir = 1;
-            else if (nx < miner.tx) dir = 3;
-            else if (ny > miner.ty) dir = 2;
-            else if (ny < miner.ty) dir = 0;
-          }
+        if (d.t >= SWING) d.t = 0;
+        stuck = 0;
+        return;
+      }
+      if (miner.step) {
+        miner.step.t += 1;
+        const k = Math.min(1, miner.step.t / STEP_FRAMES);
+        const sx = miner.tx * T, sy = miner.ty * T;
+        miner.px = sx + (miner.step.tx * T - sx) * k;
+        miner.py = sy + (miner.step.ty * T - sy) * k;
+        if (k >= 1) arrive();
+        stuck = 0;
+        return;
+      }
+
+      miner.px = miner.tx * T;
+      miner.py = miner.ty * T;
+
+      if (miner.cool > 0) { miner.cool -= 1; stuck = 0; return; }
+
+      if (manual >= 0) {
+        const dir = manual;
+        manual = -1;
+        if (beginStep(dir)) { stuck = 0; return; }
+      }
+
+      const idle = now() - lastInput > 3500 && !reduce;
+
+      // Only the autopilot waits for idle. A tapped path walks at once.
+      if (idle) {
+        // Fight what is next to you. On the last heart, run home.
+        const foe = snakes.find((s) => Math.abs(s.tx - miner.tx) + Math.abs(s.ty - miner.ty) === 1);
+        if (foe && hp > 1) {
+          const d = foe.tx > miner.tx ? 1 : foe.tx < miner.tx ? 3 : foe.ty > miner.ty ? 2 : 0;
+          if (beginStep(d)) { stuck = 0; return; }
         }
-        if (dir >= 0 && dir < 4) {
-          if (dir === 1) miner.face = 1;
-          if (dir === 3) miner.face = -1;
-          if (!stepMiner(dir)) path = [];
-          inputDir = -1;
+        if (hp <= 1 && snakes.length && miner.ty >= 1 && !path.length) {
+          path = route(miner.tx, miner.ty, (x, y) => x === forge.tx && y === forge.ty) || [];
         }
+        if (!path.length) replan();
+      }
+
+      if (path.length) {
+        const [nx, ny] = path[0];
+        if (nx === miner.tx && ny === miner.ty) { path.shift(); return; }
+        let dir = -1;
+        if (nx > miner.tx) dir = 1;
+        else if (nx < miner.tx) dir = 3;
+        else if (ny > miner.ty) dir = 2;
+        else if (ny < miner.ty) dir = 0;
+        if (dir < 0 || !beginStep(dir)) { path = []; stuck += 1; }
+        else { path.shift(); stuck = 0; }
+      } else if (idle) {
+        stuck += 1;
       } else {
-        const txp = miner.tx * T;
-        const typ = miner.ty * T;
-        miner.fx += (txp - miner.fx) * 0.35;
-        miner.fy += (typ - miner.fy) * 0.35;
-        if (Math.abs(txp - miner.fx) < 1.5 && Math.abs(typ - miner.fy) < 1.5) {
-          miner.fx = txp;
-          miner.fy = typ;
-          miner.moving = false;
-        }
+        stuck = 0;
+      }
+
+      // Nothing reachable for two seconds, so reseed.
+      if (stuck > 120) {
+        stuck = 0;
+        if (miner.carry.length) deposit();
+        seedOre(5);
+        path = [];
       }
     }
 
+    // ---- drawing ----------------------------------------------------------
     function px(x, y, w, h, color) {
       g.fillStyle = color;
-      g.fillRect(Math.round(x), Math.round(y), w, h);
+      g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+    }
+    const hash = (tx, ty) => ((tx * 73856093) ^ (ty * 19349663)) >>> 0;
+
+    // Warm tan at the crust, darker with depth.
+    function earthColor(ty) {
+      const d = (ty - 1) / Math.max(1, H - 2);
+      return `hsl(${28 - d * 6} ${26 - d * 9}% ${26 - d * 13}%)`;
+    }
+    function earthLight(ty) {
+      const d = (ty - 1) / Math.max(1, H - 2);
+      return `hsl(${32 - d * 6} ${30 - d * 10}% ${36 - d * 15}%)`;
+    }
+
+    function drawTile(tx, ty) {
+      const v = at(tx, ty);
+      const x = tx * T, y = ty * T;
+      if (v === SKY) return;
+
+      if (v === TUNNEL) {
+        px(x, y, T, T, "#120c08");
+        if (at(tx, ty - 1) !== TUNNEL && at(tx, ty - 1) !== SKY) px(x, y, T, 2, "#0a0705");
+        return;
+      }
+      if (v === BEDROCK) {
+        // Dark stone, not a black bar, since the floor row shows.
+        px(x, y, T, T, "#221b16");
+        px(x, y, T, 2, "#2c241d");
+        const h = hash(tx, ty);
+        if (h % 3 === 0) px(x + (h % 9), y + 4 + ((h >> 3) % 8), 3, 2, "#1a1410");
+        if (h % 4 === 0) px(x + 2 + ((h >> 6) % 10), y + 3, 2, 1, "#332a22");
+        return;
+      }
+      if (v === DIRT || v === ORE) {
+        px(x, y, T, T, earthColor(ty));
+        const h = hash(tx, ty);
+        if (h % 4 === 0) px(x + (h % 10) + 1, y + ((h >> 4) % 10) + 1, 2, 2, earthLight(ty));
+        if (h % 7 === 0) px(x + ((h >> 8) % 11), y + ((h >> 11) % 11), 1, 1, "#5c4630");
+        const above = at(tx, ty - 1);
+        // Topsoil steps daylight down into the dark.
+        if (above === SKY) {
+          px(x, y, T, 3, "hsl(30 30% 47%)");
+          px(x, y + 3, T, 2, "hsl(29 28% 37%)");
+          if (h % 3 === 0) px(x + (h % 12), y + 3, 2, 1, "hsl(31 30% 43%)");
+        } else if (above === TUNNEL) {
+          px(x, y, T, 2, earthLight(ty));
+        }
+        if (v === ORE) drawOre(tx, ty);
+        return;
+      }
+      if (v === ROCK) {
+        px(x, y, T, T, "#413b34");
+        px(x, y, T, 2, "#575046");
+        px(x, y + T - 2, T, 2, "#2c2723");
+        const h = hash(tx, ty);
+        if (h % 3 === 0) px(x + 4 + (h % 5), y + 5 + ((h >> 5) % 5), 3, 2, "#4e463c");
+        if (h % 5 === 0) px(x + 2 + (h % 7), y + 3 + ((h >> 7) % 8), 2, 1, "#332e29");
+        return;
+      }
+      if (v === FORGE) {
+        // Smelter: chimney, body, furnace mouth, growing gold pile.
+        px(x + 10, y - 15, 5, 7, "#4a4038");
+        px(x + 10, y - 15, 5, 1, "#5f5449");
+        px(x - 1, y - 9, 18, 25, "#4a4038");
+        px(x - 1, y - 9, 18, 2, "#5f5449");
+        px(x - 1, y - 7, 2, 23, "#574c42");
+        px(x - 1, y + 13, 18, 3, "#302b26");
+        const h2 = hash(tx, 3);
+        px(x + 2 + (h2 % 4), y - 4, 3, 2, "#413a33");
+        px(x + 9, y + 4, 3, 2, "#413a33");
+
+        px(x + 3, y + 1, 10, 10, "#150e09");
+        const fire = Math.floor(frame / 5) % 3;
+        px(x + 4, y + 8 - fire, 8, 3 + fire, "#6d28d9");
+        px(x + 6, y + 6 - fire, 4, 4, "#a78bfa");
+        px(x + 7, y + 5 - fire, 2, 2, "#f5f3ff");
+
+        const pile = Math.min(6, Math.floor(gold / 14));
+        for (let i = 0; i < pile; i++) {
+          px(x + 17 + (i % 3) * 3, y + 13 - ((i / 3) | 0) * 3, 3, 3, i % 2 ? "#ffd76a" : "#e0a92e");
+        }
+        return;
+      }
+    }
+
+    function drawOre(tx, ty) {
+      const t = tierOf(tier[ty * W + tx]);
+      const x = tx * T, y = ty * T;
+      const tw = (frame + tx * 7 + ty * 3) % 96 < 5;
+      px(x + 5, y + 3, 6, 2, t.mid);
+      px(x + 3, y + 5, 10, 4, t.lo);
+      px(x + 4, y + 9, 8, 3, t.mid);
+      px(x + 6, y + 12, 4, 2, t.lo);
+      px(x + 5, y + 5, 3, 2, t.hi);
+      px(x + 9, y + 8, 2, 2, t.hi);
+      if (tw) px(x + 7, y + 4, 2, 2, "#ffffff");
+    }
+
+    // 3x5 font. HUD shares the world pixel grid, so it cannot drift in style.
+    const FONT = {
+      "0": ["###", "#.#", "#.#", "#.#", "###"],
+      "1": [".#.", "##.", ".#.", ".#.", "###"],
+      "2": ["###", "..#", "###", "#..", "###"],
+      "3": ["###", "..#", "###", "..#", "###"],
+      "4": ["#.#", "#.#", "###", "..#", "..#"],
+      "5": ["###", "#..", "###", "..#", "###"],
+      "6": ["###", "#..", "###", "#.#", "###"],
+      "7": ["###", "..#", "..#", "..#", "..#"],
+      "8": ["###", "#.#", "###", "#.#", "###"],
+      "9": ["###", "#.#", "###", "..#", "###"],
+      A: ["###", "#.#", "###", "#.#", "#.#"],
+      C: ["###", "#..", "#..", "#..", "###"],
+      D: ["##.", "#.#", "#.#", "#.#", "##."],
+      E: ["###", "#..", "##.", "#..", "###"],
+      G: ["###", "#..", "#.#", "#.#", "###"],
+      H: ["#.#", "#.#", "###", "#.#", "#.#"],
+      I: ["###", ".#.", ".#.", ".#.", "###"],
+      K: ["#.#", "#.#", "##.", "#.#", "#.#"],
+      L: ["#..", "#..", "#..", "#..", "###"],
+      N: ["#.#", "###", "###", "###", "#.#"],
+      O: ["###", "#.#", "#.#", "#.#", "###"],
+      R: ["###", "#.#", "##.", "#.#", "#.#"],
+      S: ["###", "#..", "###", "..#", "###"],
+      T: ["###", ".#.", ".#.", ".#.", ".#."],
+      V: ["#.#", "#.#", "#.#", "#.#", ".#."],
+      W: ["#.#", "#.#", "###", "###", "#.#"],
+      " ": ["...", "...", "...", "...", "..."],
+    };
+    const GLYPH_W = 3, GLYPH_H = 5;
+
+    const textWidth = (str) => str.length * (GLYPH_W + 1) - 1;
+
+    function drawText(str, x, y, color) {
+      let cx = x;
+      for (const ch of str.toUpperCase()) {
+        const rows = FONT[ch] || FONT[" "];
+        for (let r = 0; r < GLYPH_H; r++) {
+          for (let c = 0; c < GLYPH_W; c++) {
+            if (rows[r][c] === "#") px(cx + c, y + r, 1, 1, color);
+          }
+        }
+        cx += GLYPH_W + 1;
+      }
     }
 
     const PAL = {
-      h: "#d9d2e2", H: "#b3aac4",
-      y: "#ffd54a", Y: "#fff3c4",
-      f: "#e8b98a", e: "#241a33",
-      j: "#5b3f9e", J: "#4a2f85",
-      B: "#2b1f4a", p: "#4a2f85",
-      k: "#241a33", w: "#8a5a2b", m: "#cfd2dd",
+      h: "#e4dced", H: "#b3aac4",
+      y: "#ffd54a", f: "#e8b98a", e: "#241a33",
+      j: "#6d4fc0", J: "#54399b", B: "#2b1f4a",
+      p: "#54399b", k: "#1d1530", w: "#9a6636", m: "#d6d9e4",
+      q: "#3d2a72", n: "#140e22",                 // far leg, shaded back
     };
     const BODY = [
       ".....hhhhhh.....",
       "....hhhhhhhh....",
       "...hhhhyyyhhh...",
       "..hhhhhhhyyhh...",
-      "hhhhhhhhhhhhhhh",
+      ".hhhhhhhhhhhhhh.",
       ".....fffff......",
       "....fffffff.....",
       "....fffefef.....",
@@ -714,294 +1135,283 @@
       ".....pp..pp.....",
       ".....kk..kk.....",
     ];
-    const BODY_W1 = [
-      ".....hhhhhh.....",
-      "....hhhhhhhh....",
-      "...hhhhyyyhhh...",
-      "..hhhhhhhyyhh...",
-      "hhhhhhhhhhhhhhh",
-      ".....fffff......",
-      "....fffffff.....",
-      "....fffefef.....",
-      "....fffffff.....",
-      ".....fffff......",
-      ".....jjjjjj.....",
-      "....jjjjjjjj....",
-      "....jJjjjjJj....",
-      "....jjjjjjjj....",
-      "....jBBBBBBj....",
-      "....jjjjjjjj....",
-      ".....pppppp.....",
-      "....pp..pp......",
-      "...pp....pp.....",
-      "...kk....kk.....",
-    ];
-    const BODY_W2 = [
-      ".....hhhhhh.....",
-      "....hhhhhhhh....",
-      "...hhhhyyyhhh...",
-      "..hhhhhhhyyhh...",
-      "hhhhhhhhhhhhhhh",
-      ".....fffff......",
-      "....fffffff.....",
-      "....fffefef.....",
-      "....fffffff.....",
-      ".....fffff......",
-      ".....jjjjjj.....",
-      "....jjjjjjjj....",
-      "....jJjjjjJj....",
-      "....jjjjjjjj....",
-      "....jBBBBBBj....",
-      "....jjjjjjjj....",
-      ".....pppppp.....",
-      ".....pp..pp.....",
-      "....pp....pp....",
-      "....kk....kk.....",
+    // Walk cycle: contact, pass, mirrored, pass. Back leg shaded so legs cross.
+    const WALK = [
+      ["....pp...qq.....", "...pp.....qq....", "...kk.....nn...."],
+      [".....pp.qq......", ".....pp.qq......", ".....kk.nn......"],
+      ["....qq...pp.....", "...qq.....pp....", "...nn.....kk...."],
+      [".....qq.pp......", ".....qq.pp......", ".....nn.kk......"],
     ];
 
-    function drawBody(rows, x, y) {
-      for (let r = 0; r < rows.length; r++) {
-        const row = rows[r];
+    function drawBody(x, y, legs) {
+      for (let r = 0; r < BODY.length; r++) {
+        const row = (legs && r >= 17) ? legs[r - 17] : BODY[r];
         for (let c = 0; c < row.length; c++) {
           const ch = row[c];
-          if (ch === "." || ch === " ") continue;
-          if (PAL[ch]) px(x + c, y + r, 1, 1, PAL[ch]);
+          if (ch === ".") continue;
+          const col = PAL[ch];
+          if (col) px(x + c, y + r, 1, 1, col);
         }
       }
     }
 
-    function drawPick(phase, x, y) {
-      if (phase === 0) {
-        px(x + 10, y + 2, 2, 10, PAL.w);
-        px(x + 6, y, 5, 2, PAL.m);
-        px(x + 10, y - 1, 2, 2, PAL.m);
-      } else if (phase === 1) {
-        px(x + 12, y - 8, 2, 12, PAL.w);
-        px(x + 9, y - 10, 5, 2, PAL.m);
+    function drawPick(t, x, y) {
+      // t runs 0 to 1 across one swing.
+      const up = t < 0.45;
+      if (up) {
+        px(x + 12, y + 2 - 8 * t * 2, 2, 11, PAL.w);
+        px(x + 9, y - 9 * t * 2, 6, 2, PAL.m);
       } else {
-        px(x + 9, y + 7, 11, 2, PAL.w);
-        px(x + 18, y + 3, 2, 7, PAL.m);
-        px(x + 18, y + 2, 3, 2, "#ffffff");
+        px(x + 11, y + 8, 9, 2, PAL.w);
+        px(x + 18, y + 5, 2, 6, PAL.m);
+        px(x + 18, y + 4, 3, 2, "#ffffff");
       }
     }
 
     function drawMiner() {
-      const idleBob = !miner.moving && miner.mineAnim === 0 ? Math.round(Math.sin(frame * 0.06)) : 0;
-      const bob = miner.moving ? (miner.walk > 7 ? 1 : 0) : idleBob;
-      const cx = miner.fx, cy = miner.fy - bob;
-
-      const lamX = cx + (miner.face === 1 ? 11 : 4);
-      const beam = g.createRadialGradient(lamX, cy + 12, 1, lamX, cy + 12, 26);
-      beam.addColorStop(0, "rgba(255, 210, 100, 0.20)");
-      beam.addColorStop(1, "rgba(255, 210, 100, 0)");
-      g.fillStyle = beam;
-      g.fillRect(lamX - 26, cy - 10, 52, 52);
+      const moving = !!miner.step;
+      const digging = !!miner.dig;
+      // Lamp off in daylight, on under the crust.
+      lamp += ((miner.ty >= 1 ? 1 : 0) - lamp) * 0.18;
+      PAL.y = lamp > 0.5 ? "#ffd54a" : "#8d7a55";
+      miner.bob = moving ? (miner.bob + 1) % 16 : 0;
+      const cyc = (miner.bob >> 2) & 3;
+      // Body rides highest on the passing frames.
+      const lift = moving ? (cyc & 1) : (!digging && !reduce ? (Math.sin(frame * 0.05) > 0 ? 1 : 0) : 0);
+      const x = Math.round(miner.px);
+      const y = Math.round(miner.py) - 4 - lift;  // sprite is 20 tall in a 16 tile
 
       g.save();
-      g.translate(Math.round(cx), Math.round(cy));
+      g.translate(x + 8, y);
       if (miner.face === -1) g.scale(-1, 1);
-      g.translate(-1, 0);
-      const swing = miner.mineAnim > 0;
-      const phase = swing ? Math.floor((14 - miner.mineAnim) / 5) : -1;
-      if (swing) drawPick(phase, 0, 0);
-      else px(0, 9, 1, 6, PAL.w);
-      let rows = BODY;
-      if (miner.moving) rows = miner.walk > 7 ? BODY_W2 : BODY_W1;
-      drawBody(rows, 0, 0);
+      g.translate(-8, 0);
+      if (digging) drawPick(miner.dig.t / SWING, 0, 0);
+      else px(2, 9, 1, 7, PAL.w);
+      drawBody(0, 0, moving ? WALK[cyc] : null);
       g.restore();
 
-      for (let i = 0; i < miner.carry.length; i++) {
-        const tier = TIERS[miner.carry[i]];
-        const gy = cy - 12 - i * 7;
-        px(cx + 4, gy, 6, 2, tier.color);
-        px(cx + 2, gy + 2, 10, 3, tier.mid);
-        px(cx + 5, gy + 5, 4, 2, tier.dark);
-        px(cx + 6, gy + 1, 2, 1, tier.hi);
+      // Haul sits in a row above the helmet so it never clips.
+      const n = miner.carry.length;
+      for (let i = 0; i < n; i++) {
+        const t = TIERS[miner.carry[i]];
+        const gx = x + 8 - (n * 5 - 1) / 2 + i * 5;
+        const gy = y - 7 + (i % 2);
+        px(gx, gy, 4, 2, t.mid);
+        px(gx - 1, gy + 2, 6, 3, t.lo);
+        px(gx, gy + 1, 2, 1, t.hi);
       }
     }
 
-    function drawGemRock(gm) {
-      if (gm.state !== "inrock" && gm.state !== "dirt") return;
-      const x = gm.tx * T, y = gm.ty * T;
-      const tier = TIERS[gm.tier];
-      const tw = frame % 28 < 4;
-      const on = gm.host === "rock" ? y + 4 : y;
-      px(x + 4, on, 8, 2, tier.color);
-      px(x + 2, on + 2, 12, 3, tier.color);
-      px(x + 4, on + 5, 8, 2, tier.mid);
-      px(x + 3, on + 3, 3, 2, tier.hi);
-      px(x + 10, on + 4, 2, 1, tier.dark);
-      px(x + 7, on + 1, 2, 2, tw ? "#ffffff" : tier.hi);
-      if (gm.crack === 1) {
-        px(x + 3, y + 8, 1, 3, "#7d756a");
-        px(x + 7, y + 10, 2, 1, "#7d756a");
-        px(x + 12, y + 8, 1, 3, "#7d756a");
-      }
-    }
-
-    function drawTile(tx, ty) {
-      const v = at(tx, ty);
-      const x = tx * T, y = ty * T;
-      if (v === O.SPACE) return;
-      if (v === O.DIRT) {
-        px(x, y, T, T, ((tx * 7 + ty * 13) % 3 === 0) ? DIRT_B : DIRT_A);
-        if ((tx * 3 + ty * 5) % 4 === 0) px(x + 5, y + 6, 2, 2, DIRT_HI);
-        if ((tx * 5 + ty * 3) % 5 === 0) px(x + 10, y + 9, 2, 2, DIRT_LO);
-        if ((tx * 11 + ty * 7) % 6 === 0) px(x + 2, y + 3, 1, 1, DIRT_LO);
-        return;
-      }
-      if (v === O.ROCK) {
-        px(x, y, T, T, ROCK_A);
-        px(x, y, T, 3, ROCK_HI);
-        px(x, y + T - 3, T, 3, ROCK_LO);
-        px(x, y + T - 1, T, 1, ROCK_LINE);
-        if ((tx * 7 + ty * 13) % 5 === 0) px(x + 6, y + 7, 2, 2, ROCK_LO);
-        if ((tx * 3 + ty * 5) % 7 === 0) px(x + 3, y + 4, 1, 1, ROCK_HI);
-        return;
-      }
-      if (v === O.FORGE) {
-        px(x, y, T, T, "#8a5a2b");
-        px(x, y, T, 3, "#a5713f");
-        px(x, y + T - 2, T, 2, "#6d4520");
-        px(x + 6, y + 6, 4, 3, "#f5c542");
-        const fire = Math.floor(frame / 6) % 3;
-        px(x + 3, y - 3, 10, 3, "#6d28d9");
-        px(x + 5, y - 3 - fire, 6, 2 + fire, "#a78bfa");
-        px(x + 7, y - 4 - fire, 2, 2, "#ede9fe");
-      }
-    }
-
-    function drawSky(w, h) {
-      const sky = g.createLinearGradient(0, 0, 0, h);
-      sky.addColorStop(0, "#f8f5fc");
-      sky.addColorStop(1, "#ffffff");
-      g.fillStyle = sky;
-      g.fillRect(0, 0, w, h);
-    }
-
-    function drawWorld() {
-      const w = window.innerWidth / S, h = window.innerHeight / S;
+    function drawLight(w, h) {
+      // Clip light below the crust. Over cream sky it blooms white.
       g.save();
-      if (shake > 0) {
-        g.translate((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3);
+      g.beginPath();
+      g.rect(cam - 20, T, w + 40, H * T);
+      g.clip();
+      g.globalCompositeOperation = "lighter";
+      // Miner lamp, only underground.
+      if (lamp > 0.02) {
+        const lx = miner.px + 8 + miner.face * 3, ly = miner.py + 6;
+        const r = g.createRadialGradient(lx, ly, 2, lx, ly, 54);
+        r.addColorStop(0, `rgba(255, 206, 128, ${0.22 * lamp})`);
+        r.addColorStop(0.5, `rgba(255, 188, 108, ${0.08 * lamp})`);
+        r.addColorStop(1, "rgba(255, 178, 98, 0)");
+        g.fillStyle = r;
+        g.fillRect(lx - 54, ly - 54, 108, 108);
+      }
+
+      // Ore glow, only for tiles on screen.
+      const x0 = Math.max(0, Math.floor(cam / T) - 1);
+      const x1 = Math.min(W - 1, Math.ceil((cam + w) / T) + 1);
+      for (let ty = 1; ty < H; ty++) {
+        for (let tx = x0; tx <= x1; tx++) {
+          if (at(tx, ty) !== ORE) continue;
+          const t = tierOf(tier[ty * W + tx]);
+          const cx = tx * T + 8, cy = ty * T + 8;
+          const rr = g.createRadialGradient(cx, cy, 1, cx, cy, 22);
+          rr.addColorStop(0, t.mid + "55");
+          rr.addColorStop(1, "rgba(0,0,0,0)");
+          g.fillStyle = rr;
+          g.fillRect(cx - 22, cy - 22, 44, 44);
+        }
+      }
+
+      // Forge fire. Kept tight or it washes pink over the sky.
+      const fx = forge.tx * T + 8, fy = forge.ty * T + 6;
+      const fr = g.createRadialGradient(fx, fy, 1, fx, fy, 24);
+      fr.addColorStop(0, "rgba(150, 100, 255, 0.16)");
+      fr.addColorStop(1, "rgba(120, 80, 255, 0)");
+      g.fillStyle = fr;
+      g.fillRect(fx - 24, fy - 24, 48, 48);
+      g.globalCompositeOperation = "source-over";
+      g.restore();
+    }
+
+    const INK = "#4a3f33", INK_DIM = "#8d8071";
+
+    // Dark ink on cream, like the page copy, but built from cave pixels.
+    function drawHud(w) {
+      const y = 5;
+      const gemW = 7, coinW = 7, gap = 5;
+      const oreStr = String(mined), goldStr = String(gold);
+      const barW = 34;
+      const total = gemW + 2 + textWidth(oreStr) + gap + coinW + 2 + textWidth(goldStr) + gap + barW;
+      let x = Math.round(w - total - 8);
+
+      // iolite tally
+      px(x + 2, y, 3, 1, "#a78bfa");
+      px(x + 1, y + 1, 5, 2, "#8b5cf6");
+      px(x + 2, y + 3, 3, 2, "#6d28d9");
+      drawText(oreStr, x + gemW + 2, y, INK);
+      x += gemW + 2 + textWidth(oreStr) + gap;
+
+      // gold tally
+      px(x + 1, y + 1, 5, 4, "#e0a92e");
+      px(x + 2, y, 3, 1, "#ffd76a");
+      px(x + 2, y + 2, 2, 1, "#ffeaa8");
+      drawText(goldStr, x + coinW + 2, y, INK);
+      x += coinW + 2 + textWidth(goldStr) + gap;
+
+      // Health: bright fill drops at once, ghost drains after.
+      const bx = x, by = y, bh = 5;
+      px(bx, by, barW, bh, "#d8cdbd");
+      px(bx + 1, by + 1, barW - 2, bh - 2, "#efe7db");
+      const inner = barW - 2;
+      const ghost = Math.max(0, Math.round(inner * (hpShown / MAX_HP)));
+      const live = Math.max(0, Math.round(inner * (hp / MAX_HP)));
+      if (ghost > 0) px(bx + 1, by + 1, ghost, bh - 2, "#c98d84");
+      if (live > 0) {
+        px(bx + 1, by + 1, live, bh - 2, "#d2493c");
+        px(bx + 1, by + 1, live, 1, "#e8695c");
+      }
+    }
+
+    function drawTip(w, h) {
+      if (tipLeft <= 0) return;
+      const msg = "CLICK THE CAVE   ARROWS TO DIG";
+      const tw = textWidth(msg);
+      const x = Math.round((w - tw) / 2), y = h - 10;
+      g.globalAlpha = Math.min(1, tipLeft / 60);
+      drawText(msg, x, y, "#9a8b76");
+      g.globalAlpha = 1;
+    }
+
+    function draw() {
+      const w = window.innerWidth / S, h = H * T + HEAD;
+
+      // Stop one tile inside the bedrock frame so it never shows.
+      const lo = T, hi = W * T - w - T;
+      const want = hi > lo
+        ? Math.max(lo, Math.min(hi, miner.px + 8 - w / 2))
+        : Math.max(0, (W * T - w) / 2);
+      cam += (want - cam) * 0.08;
+      if (Math.abs(want - cam) < 0.4) cam = want;
+
+      g.clearRect(0, 0, w, h);
+      // Flat page colour above ground hides the top of the strip.
+      g.fillStyle = "hsl(38 44% 97%)";
+      g.fillRect(0, 0, w, HEAD + T);
+
+      g.save();
+      if (shake > 0 && !reduce) {
+        g.translate((rnd() - 0.5) * 2.5, (rnd() - 0.5) * 2.5);
         shake -= 1;
       }
-      g.clearRect(-4, -4, w + 8, h + 8);
-      drawSky(w, h);
+      // Snap to whole device pixels or tiles seam.
+      g.translate(-Math.round(cam * unit) / unit, HEAD);
 
-      const camMax = Math.max(0, W * T - w);
-      const cam = Math.min(camMax, Math.max(0, miner.fx + 8 - w / 2));
+      const x0 = Math.max(0, Math.floor(cam / T) - 1);
+      const x1 = Math.min(W - 1, Math.ceil((cam + w) / T) + 1);
+      for (let ty = 0; ty < H; ty++) for (let tx = x0; tx <= x1; tx++) drawTile(tx, ty);
 
-      g.save();
-      g.translate(-cam, caveTop);
-      for (let ty = 0; ty < H; ty++) {
-        for (let tx = 0; tx < W; tx++) drawTile(tx, ty);
-      }
-      for (const gm of gems) drawGemRock(gm);
-
-      for (const p of particles) {
-        g.globalAlpha = Math.max(0, p.life / 34);
-        if (p.gold) {
-          px(p.x - 2, p.y - 2, 4, 4, p.color);
-          px(p.x - 2, p.y - 2, 4, 1, "#fff3c4");
-        } else {
-          px(p.x, p.y, p.size, p.size, p.color);
-        }
+      // Cracks deepen with each landed swing.
+      if (miner.dig) {
+        const d = miner.dig;
+        const x = d.tx * T, y = d.ty * T;
+        g.globalAlpha = 0.75;
+        if (d.hits >= 1) { px(x + 3, y + 4, 1, 6, "#0d0906"); px(x + 4, y + 9, 2, 1, "#0d0906"); }
+        if (d.hits >= 2) { px(x + 10, y + 3, 1, 5, "#0d0906"); px(x + 8, y + 7, 3, 1, "#0d0906"); }
+        if (d.hits >= 3) { px(x + 6, y + 11, 5, 1, "#0d0906"); px(x + 12, y + 9, 1, 4, "#0d0906"); }
         g.globalAlpha = 1;
       }
 
-      drawMiner();
+      for (const s of snakes) drawSnake(s);
+      // Blink while hurt, stay down when downed.
+      if (downed > 0) { if (downed % 8 < 4) drawMiner(); }
+      else if (hurt === 0 || frame % 8 < 5) drawMiner();
 
-      const live = gems.filter((gm) => gm.state === "inrock" || gm.state === "dirt");
-      if (miner.carry.length >= 3 || !live.length) {
-        if (miner.carry.length) {
-          const bob = frame % 40 < 20 ? 0 : 3;
-          g.fillStyle = "rgba(60, 50, 40, 0.55)";
-          g.font = "8px ui-monospace, Menlo, monospace";
-          g.textAlign = "center";
-          g.fillText("▼", forge.tx * T + 8, forge.ty * T - 12 + bob);
-          g.textAlign = "left";
-        }
-      } else {
-        let best = null, bd = 1e9;
-        for (const gm of live) {
-          const d = Math.abs(gm.tx - miner.tx) + Math.abs(gm.ty - miner.ty);
-          if (d < bd) { bd = d; best = gm; }
-        }
-        if (best) {
-          const bob = frame % 40 < 20 ? 0 : 3;
-          g.fillStyle = "rgba(60, 50, 40, 0.55)";
-          g.font = "8px ui-monospace, Menlo, monospace";
-          g.textAlign = "center";
-          g.fillText("▼", best.tx * T + 8, best.ty * T - 10 + bob);
-          g.textAlign = "left";
-        }
+      for (const p of particles) {
+        g.globalAlpha = Math.max(0, Math.min(1, p.life / 28));
+        px(p.x, p.y, p.size, p.size, p.color);
+        if (p.glow) px(p.x, p.y, p.size, 1, "#ffffff");
+        g.globalAlpha = 1;
       }
 
+      drawLight(w, h);
+
+      g.font = "9px ui-monospace, Menlo, monospace";
+      g.textAlign = "center";
       for (const f of floats) {
-        g.globalAlpha = Math.max(0, f.life / 46);
+        g.globalAlpha = Math.max(0, f.life / 52);
         g.fillStyle = f.color;
-        g.font = "9px ui-monospace, Menlo, monospace";
         g.fillText(f.text, f.x, f.y);
         g.globalAlpha = 1;
       }
-      for (const s of smoke) {
-        g.fillStyle = "rgba(120, 110, 100, " + Math.max(0, 0.22 - s.age * 0.012) + ")";
-        g.fillRect(Math.round(s.x), Math.round(s.y), 3, 3);
-      }
-      g.restore();
+      g.textAlign = "left";
       g.restore();
 
-      g.font = "9px ui-monospace, Menlo, monospace";
-      g.textBaseline = "top";
-      g.fillStyle = "rgba(60, 50, 40, 0.7)";
-      g.fillText("gems " + gemsMined + " · coins " + coins, 12, 12);
-      if (miner.carry.length) {
-        g.fillStyle = "rgba(91, 63, 158, 0.8)";
-        g.fillText("haul " + miner.carry.length + "/3", 12, 24);
+      hpShown += (hp - hpShown) * 0.08;
+      drawHud(w);
+      drawTip(w, h);
+      if (flash > 0) {
+        g.fillStyle = `rgba(250, 245, 235, ${Math.min(0.85, flash / 26)})`;
+        g.fillRect(0, 0, w, h);
+        flash -= 1;
       }
     }
 
-    function loop() {
+    function step() {
       update();
-      drawWorld();
       frame += 1;
-      for (const p of particles) {
-        p.x += p.vx; p.y += p.vy; p.vy += 0.14; p.life -= 1;
+      if (tipLeft > 0) tipLeft -= 1;
+      if (frame % 24 === 0 && !reduce) {
+        particles.push({
+          x: forge.tx * T + 12, y: forge.ty * T - 16,
+          vx: 0.12 + rnd() * 0.12, vy: -0.32, life: 40 + ri(20),
+          size: 2, color: "#cbbca8", glow: false, soft: true,
+        });
       }
+      for (const p of particles) { p.x += p.vx; p.y += p.vy; p.vy += p.soft ? -0.004 : 0.13; p.life -= 1; }
+      if (particles.length > 220) particles.splice(0, particles.length - 220);
       particles = particles.filter((p) => p.life > 0);
-      for (const f of floats) { f.y -= 0.4; f.life -= 1; }
+      for (const f of floats) { f.y -= 0.35; f.life -= 1; }
       floats = floats.filter((f) => f.life > 0);
-      for (const s of smoke) {
-        s.y -= 0.35;
-        s.age += 1;
-      }
-      smoke = smoke.filter((s) => s.age < 26);
-      if (frame % 14 === 0) {
-        smoke.push({ x: forge.tx * T + 8, y: forge.ty * T - 8, age: 0 });
-      }
-      for (const gm of gems) {
-        if (gm.state !== "inrock" && gm.state !== "dirt") continue;
-        gm.spark -= 1;
-        if (gm.spark <= 0) {
-          gm.spark = 60 + (Math.random() * 80 | 0);
-          particles.push({
-            x: gm.tx * T + 4 + (Math.random() * 8 | 0),
-            y: gm.ty * T + 2,
-            vx: 0, vy: -0.5,
-            life: 20,
-            color: "#ffffff",
-            gold: false,
-            size: 1,
-          });
-        }
-      }
-      requestAnimationFrame(loop);
     }
 
+    // Fixed timestep. Durations are in frames, so 120Hz would double the speed.
+    const STEP_MS = 1000 / 60;
+    let clock = 0, backlog = 0;
+
+    function tick(now) {
+      requestAnimationFrame(tick);
+      if (document.hidden) { clock = now; return; }
+      if (!clock) clock = now;
+      backlog += Math.min(120, now - clock);
+      clock = now;
+      let ran = 0;
+      while (backlog >= STEP_MS && ran < 3) { step(); backlog -= STEP_MS; ran += 1; }
+      draw();
+    }
+
+    let resizeT = 0;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(layout, 180);
+    });
+
+    seedv = (Date.now() & 0x7fffffff) || 1;
     layout();
-    window.addEventListener("resize", layout);
-    requestAnimationFrame(loop);
+    requestAnimationFrame(tick);
   </script>
 </body>
 </html>

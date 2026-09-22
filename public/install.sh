@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Iolit client installer. Usage: curl -fsSL iolit.dev/install | sh
+# Iolit client installer. Usage: curl -fsSL iolit.dev/install.sh | sh
 # Installs to ~/.iolit/bin, adds itself to PATH via shell rc.
 
 set -e
@@ -7,16 +7,20 @@ set -e
 VERSION="${IOLIT_VERSION:-main}"
 INSTALL_DIR="$HOME/.iolit"
 BIN_DIR="$INSTALL_DIR/bin"
-TMP_DIR="$INSTALL_DIR/tmp"
 REPO="https://github.com/Emad-log/iolit-client.git"
 
 echo "Installing Iolit client ($VERSION)..."
 
-mkdir -p "$BIN_DIR" "$TMP_DIR"
+mkdir -p "$BIN_DIR"
 
-# Require node
+# Require node >= 20
 if ! command -v node >/dev/null 2>&1; then
   echo "Error: Node.js >= 20 required. Install it first: https://nodejs.org"
+  exit 1
+fi
+NODE_MAJOR="$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)"
+if [ "$NODE_MAJOR" -lt 20 ]; then
+  echo "Error: Node.js >= 20 required (found $(node -v)). Install it first: https://nodejs.org"
   exit 1
 fi
 
@@ -37,12 +41,11 @@ npm run build
 ln -sf "$INSTALL_DIR/repo/dist/cli.js" "$BIN_DIR/iolit"
 chmod +x "$BIN_DIR/iolit"
 
-# Add to PATH
-case ":$PATH:" in
-  *":$BIN_DIR:"*) ;;
-  *) echo "export PATH=\"$BIN_DIR:\$PATH\"" >> "$HOME/.bashrc"
-     echo "export PATH=\"$BIN_DIR:\$PATH\"" >> "$HOME/.zshrc" 2>/dev/null || true ;;
-esac
+# Add to PATH, once per rc file
+for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+  [ -f "$rc" ] || continue
+  grep -qF "$BIN_DIR" "$rc" 2>/dev/null || echo "export PATH=\"$BIN_DIR:\$PATH\"" >> "$rc"
+done
 
 echo ""
 echo "Done. Run: iolit"

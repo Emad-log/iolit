@@ -194,7 +194,7 @@
       <p class="err" id="err">Something went wrong. Try again.</p>
       <button class="term" id="copy" type="button">
         <span class="dollar">$</span>
-        <span>curl -fsSL iolit.dev/install | sh</span>
+        <span>curl -fsSL iolit.dev/install.sh | sh</span>
         <span class="hint" id="copied">copy</span>
       </button>
       <footer>
@@ -211,7 +211,7 @@
   </div>
 
   <script>
-    const INSTALL = "curl -fsSL iolit.dev/install | sh";
+    const INSTALL = "curl -fsSL iolit.dev/install.sh | sh";
     document.getElementById("copy").addEventListener("click", async () => {
       try { await navigator.clipboard.writeText(INSTALL); } catch {}
       const hint = document.getElementById("copied");
@@ -1299,7 +1299,7 @@
 
     function drawTip(w, h) {
       if (tipLeft <= 0) return;
-      const msg = "CLICK THE CAVE   ARROWS TO DIG";
+      const msg = "USE ARROW KEYS TO DIG";
       const tw = textWidth(msg);
       const x = Math.round((w - tw) / 2), y = h - 10;
       g.globalAlpha = Math.min(1, tipLeft / 60);

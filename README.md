@@ -6,38 +6,28 @@ Iolit is a waitlist site for an open-source agent that captures AI coding
 sessions (Claude, Cursor, Codex). You pick pulse, trace, or raw
 before anything leaves. One audited network call.
 
-## Tech
-
-- React + Vite + TypeScript
-- Tailwind CSS
-- Self-hosted fonts (Inter + Fraunces)
-- No dependencies beyond the framework
+The site is plain static HTML. No framework, no build-time bundle, no
+runtime dependencies. The homepage is a playable cave game written in a
+single inline script.
 
 ## Structure
 
 ```
-src/
-  App.tsx          page composition + scroll observer
-  App.css          all styles (theme tokens, components, animations)
-  main.tsx         entry point
-  components/
-    GemMark.tsx    logo (SVG)
-    Navbar.tsx     fixed nav
-    Hero.tsx       hero with waitlist form + install command
-    HowItWorks.tsx 3-step explanation
-    Features.tsx   dark privacy section (inverted, full-bleed)
-    Newsletter.tsx CTA with second waitlist form
-    Footer.tsx     footer with watermark
+index.html         homepage (waitlist form, install command, cave game)
 public/
-  favicon.svg
-  fonts/           self-hosted woff2
-  install.sh       curl install script
+  preview.html     earlier standalone build of the cave game
+  install.sh       curl install script, served at iolit.dev/install.sh
   llms.txt         AI-readable site description
+  privacy.html     privacy policy
+  terms.html       terms
   robots.txt
   sitemap.xml
-  terms.html
-  privacy.html
+  favicon.svg
   og-image.png
+  fonts/           self-hosted woff2 (Inter + Fraunces)
+test/
+  preview.test.js  headless game tests (world gen, mining, snakes, routing)
+  site.test.js     guards the install URL and shipped copy strings
 ```
 
 ## Develop
@@ -54,6 +44,22 @@ npm run build
 ```
 
 Output is static files in `dist/`. Deployed at [iolit.dev](https://iolit.dev).
+
+## Test
+
+```sh
+npm test
+```
+
+## Install command
+
+The installer is served at `iolit.dev/install.sh`. Do not link to
+`iolit.dev/install`: the server answers unknown paths with the homepage,
+so that URL would pipe HTML into sh.
+
+```sh
+curl -fsSL iolit.dev/install.sh | sh
+```
 
 ## License
 

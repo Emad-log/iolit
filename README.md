@@ -1,5 +1,7 @@
 # Iolit
 
+[![CI](https://github.com/Emad-log/iolit/actions/workflows/ci.yml/badge.svg)](https://github.com/Emad-log/iolit/actions/workflows/ci.yml)
+
 Your AI subscription should pay you back.
 
 Iolit is a waitlist site for an open-source agent that captures AI coding
@@ -61,6 +63,16 @@ so that URL would pipe HTML into sh.
 curl -fsSL iolit.dev/install.sh | sh
 ```
 
+## Related
+
+- [iolit-client](https://github.com/Emad-log/iolit-client): the agent the installer sets up
+- [iolit-api](https://github.com/Emad-log/iolit-api): the API it sends approved batches to
+
+## Status
+
+Shelved. Iolit was a waitlist for an idea that did not take off. The site
+stays up and the code stays here for anyone who wants to read it.
+
 ## License
 
-MIT
+[MIT](LICENSE)
